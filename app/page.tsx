@@ -4,42 +4,38 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-const categories = [
-  { title: 'Plumbing', image: 'https://ijenintechstorage.blob.core.windows.net/userpictures/dbbfe3d2-92cd-43e9-805e-e81e28e8cb2c.png' },
-  { title: 'Electricity', image: 'https://ijenintechstorage.blob.core.windows.net/userpictures/b114de1c-670c-433b-8834-03f2db778da0.png' },
-  { title: 'Housekeeping', image: 'https://ijenintechstorage.blob.core.windows.net/userpictures/c322eceb-27ab-4660-beb4-ae0f6e29f346.png' },
-  { title: 'Windows & Blinds', image: 'https://ijenintechstorage.blob.core.windows.net/userpictures/6ae5f205-a0c0-4e81-8355-2389c3490037.png' },
-  { title: 'Air Conditioning', image: 'https://ijenintechstorage.blob.core.windows.net/userpictures/13cf2973-b3a6-4a9d-b39d-66ed25e73dcc.png' },
-  { title: 'Handyman & Assembly', image: 'https://ijenintechstorage.blob.core.windows.net/userpictures/e44291fa-1803-4475-9489-60d584dff23f.png' },
-  { title: 'Washing Machine Repair', image: 'https://ijenintechstorage.blob.core.windows.net/userpictures/037d075f-a114-4f6e-8f10-e9dc03ae9cf9.png' },
-  { title: 'Painting', image: 'https://ijenintechstorage.blob.core.windows.net/userpictures/af81ea6f-720a-4f62-8b5c-db9ea13b84ac.png' },
-  { title: 'Babysitting', image: 'https://ijenintechstorage.blob.core.windows.net/userpictures/a9414d9d-f60e-4ede-8409-779160af2720.png' },
-  { title: 'Gardening', image: 'https://ijenintechstorage.blob.core.windows.net/userpictures/b04e914b-1abd-4c47-93e4-fd389c4a6fec.png' },
-];
-
-const highlights = [
-  { label: 'Avg. arrival time', value: '35 min' },
-  { label: 'Verified providers', value: '1,200+' },
-  { label: 'Cities covered', value: '40+' },
-];
-
-const sliderImages = [
-  'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1582719478121-114b1e1d1a17?auto=format&fit=crop&w=1200&q=80',
-];
+type HomeContent = {
+  sliderImages: string[];
+  hero: {
+    title: string;
+    subtitle: string;
+    body: string;
+    leftTitle: string;
+    leftBody: string;
+  };
+  search: { placeholder: string; buttonText: string };
+  categories: { title: string; image: string }[];
+  highlights: { label: string; value: string }[];
+};
 
 export default function Home() {
   const [slide, setSlide] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileName, setProfileName] = useState('Guest');
   const [profilePic, setProfilePic] = useState('https://api.dicebear.com/7.x/initials/svg?seed=User');
+  const [content, setContent] = useState<HomeContent | null>(null);
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setSlide((prev) => (prev + 1) % sliderImages.length);
-    }, 3500);
-    return () => clearInterval(id);
+    const load = async () => {
+      try {
+        const res = await fetch('/api/home');
+        const data = (await res.json()) as HomeContent;
+        setContent(data);
+      } catch {
+        // keep null
+      }
+    };
+    load();
   }, []);
 
   useEffect(() => {
@@ -69,6 +65,14 @@ export default function Home() {
     };
     loadProfile();
   }, []);
+
+  useEffect(() => {
+    if (!content?.sliderImages?.length) return;
+    const id = setInterval(() => {
+      setSlide((prev) => (prev + 1) % content.sliderImages.length);
+    }, 3500);
+    return () => clearInterval(id);
+  }, [content?.sliderImages?.length]);
 
   return (
     <div style={{ background: 'radial-gradient(circle at 20% 20%, rgba(14,165,233,0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(16,185,129,0.12), transparent 30%), #f7f9fb' }}>
@@ -139,7 +143,7 @@ export default function Home() {
         >
           {/* Slider background */}
           <div style={{ position: 'absolute', inset: 0 }}>
-            {sliderImages.map((src, idx) => (
+            {content?.sliderImages?.map((src, idx) => (
               <img
                 key={src}
                 src={src}
@@ -177,13 +181,13 @@ export default function Home() {
           >
             <div style={{ color: 'white', position: 'relative', height: '100%', paddingBottom: '1.5rem' }}>
               <div style={{ fontWeight: 800, fontSize: '2rem', marginBottom: '0.8rem', letterSpacing: -0.5 }}>
-                On-demand home services
+                {content?.hero.leftTitle}
               </div>
               <p style={{ maxWidth: 520, margin: 0, opacity: 0.95, lineHeight: 1.6, fontSize: '1.05rem' }}>
-                Plumbers, electricians, cleaners, HVAC, handymen, painters, babysitters, and more—book trusted pros in minutes.
+                {content?.hero.leftBody}
               </p>
               <div style={{ position: 'absolute', bottom: 0, left: 0, display: 'flex', gap: '0.35rem' }}>
-                {sliderImages.map((_, idx) => (
+                {content?.sliderImages?.map((_, idx) => (
                   <span
                     key={idx}
                     style={{
@@ -211,17 +215,17 @@ export default function Home() {
               }}
             >
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.35rem 0.65rem', borderRadius: 9999, background: 'rgba(15,23,42,0.06)', fontSize: '0.9rem', fontWeight: 600 }}>
-                Trusted on-demand home services
+                {content?.hero.subtitle ?? 'Trusted on-demand home services'}
               </div>
               <h1 style={{ margin: '1rem 0 0.75rem', fontSize: '2.7rem', lineHeight: 1.05, letterSpacing: -0.5 }}>
-                Book reliable pros for any job, in minutes.
+                {content?.hero.title}
               </h1>
               <p style={{ color: '#475569', marginBottom: '1.25rem', fontSize: '1.02rem' }}>
-                Compare vetted providers, get instant confirmations, and track your booking from start to finish.
+                {content?.hero.body}
               </p>
               <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
                 <input
-                  placeholder="What do you need help with?"
+                  placeholder={content?.search.placeholder ?? 'What do you need help with?'}
                   style={{
                     flex: '1 1 240px',
                     padding: '0.9rem 1rem',
@@ -245,11 +249,11 @@ export default function Home() {
                     cursor: 'pointer',
                   }}
                 >
-                  Find services
+                  {content?.search.buttonText ?? 'Find services'}
                 </button>
               </div>
               <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
-                {highlights.map((item) => (
+                {content?.highlights?.map((item) => (
                   <div
                     key={item.label}
                     style={{
@@ -280,7 +284,7 @@ export default function Home() {
             </Link>
           </div>
           <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))' }}>
-            {categories.map((cat) => (
+            {content?.categories?.map((cat) => (
               <div
                 key={cat.title}
                 style={{
