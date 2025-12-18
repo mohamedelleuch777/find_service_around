@@ -1,12 +1,36 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const router = useRouter();
+
+  // If we already have a token stored and it is valid, redirect home.
+  useEffect(() => {
+    const idToken = typeof window !== 'undefined' ? localStorage.getItem('idToken') : null;
+    if (!idToken) {
+      setChecking(false);
+      return;
+    }
+
+    const verify = async () => {
+      const res = await fetch('/api/auth/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+      if (res.ok) router.replace('/');
+      else setChecking(false);
+    };
+
+    verify().catch(() => setChecking(false));
+  }, [router]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -26,13 +50,18 @@ export default function LoginPage() {
         return;
       }
 
-      setStatus(`Welcome back ${data.user.email}. ID token: ${data.tokens.idToken.slice(0, 8)}...`);
+      localStorage.setItem('idToken', data.tokens.idToken);
+      localStorage.setItem('refreshToken', data.tokens.refreshToken);
+      setStatus(`Welcome back ${data.user.email}. Redirecting...`);
+      router.replace('/');
     } catch (error) {
       setStatus('Unexpected error');
     } finally {
       setLoading(false);
     }
   };
+
+  if (checking) return null;
 
   return (
     <main style={{ padding: '2rem 1.5rem', maxWidth: 480, margin: '0 auto' }}>
