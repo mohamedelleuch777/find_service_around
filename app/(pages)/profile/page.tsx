@@ -13,6 +13,7 @@ export default function ProfilePage() {
   const [profilePic, setProfilePic] = useState('/avatar-placeholder.png');
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountType, setAccountType] = useState<'user' | 'provider'>('user');
+  const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [age, setAge] = useState<number | ''>('');
@@ -56,11 +57,14 @@ export default function ProfilePage() {
     setIsLoggedIn(true);
 
     const userId = localStorage.getItem('profileUserId') || DEFAULT_USER_ID;
+    const fallbackEmail = typeof window !== 'undefined' ? localStorage.getItem('pendingVerificationEmail') || '' : '';
+
     fetch(`/api/profile?userId=${encodeURIComponent(userId)}`)
       .then((res) => res.json())
       .then((data) => {
         if (data?.profile) {
           setAccountType(data.profile.accountType ?? 'user');
+          setEmail(data.profile.email ?? fallbackEmail);
           setFirstName(data.profile.firstName ?? '');
           setLastName(data.profile.lastName ?? '');
           setAge(typeof data.profile.age === 'number' ? data.profile.age : '');
@@ -80,6 +84,8 @@ export default function ProfilePage() {
           setProfileName(fullName);
           if (data.profile.photoDataUrl) setProfilePic(data.profile.photoDataUrl);
           else setProfilePic('/avatar-placeholder.png');
+        } else {
+          setEmail(fallbackEmail);
         }
       })
       .finally(() => setInitializing(false));
@@ -108,6 +114,7 @@ export default function ProfilePage() {
         body: JSON.stringify({
           userId,
           accountType,
+          email,
           firstName,
           lastName,
           age: age === '' ? undefined : age,
@@ -296,6 +303,17 @@ export default function ProfilePage() {
           onSubmit={onSubmit}
           style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}
         >
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            <span>Email</span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+            />
+          </label>
+
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
             <span>Account type</span>
             <select

@@ -23,6 +23,7 @@ export async function POST(request: Request) {
 
   const payload = {
     userId,
+    email: body.email ?? '',
     accountType: body.accountType === 'provider' ? 'provider' : 'user',
     firstName: body.firstName,
     lastName: body.lastName,
