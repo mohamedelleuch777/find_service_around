@@ -46,5 +46,21 @@ export async function GET() {
     await docRef.set(defaultContent);
     return NextResponse.json(defaultContent);
   }
-  return NextResponse.json(doc.data());
+  const data = doc.data() || {};
+
+  const normalizeArray = (value: unknown) => {
+    if (Array.isArray(value)) return value;
+    if (value && typeof value === 'object') return Object.values(value as Record<string, unknown>);
+    return [];
+  };
+
+  const payload = {
+    ...defaultContent,
+    ...data,
+    sliderImages: normalizeArray(data.sliderImages ?? defaultContent.sliderImages),
+    categories: normalizeArray(data.categories ?? defaultContent.categories),
+    highlights: normalizeArray(data.highlights ?? defaultContent.highlights),
+  };
+
+  return NextResponse.json(payload);
 }

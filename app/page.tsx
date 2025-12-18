@@ -3,6 +3,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 type HomeContent = {
   sliderImages: string[];
@@ -19,10 +20,12 @@ type HomeContent = {
 };
 
 export default function Home() {
+  const router = useRouter();
   const [slide, setSlide] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileName, setProfileName] = useState('Guest');
-  const [profilePic, setProfilePic] = useState('https://api.dicebear.com/7.x/initials/svg?seed=User');
+  const [profilePic, setProfilePic] = useState('/avatar-placeholder.png');
+  const [menuOpen, setMenuOpen] = useState(false);
   const [content, setContent] = useState<HomeContent | null>(null);
 
   useEffect(() => {
@@ -43,6 +46,7 @@ export default function Home() {
     const userId = typeof window !== 'undefined' ? localStorage.getItem('profileUserId') || 'demo-user' : 'demo-user';
     if (!token) {
       setIsLoggedIn(false);
+      setMenuOpen(false);
       return;
     }
     setIsLoggedIn(true);
@@ -57,7 +61,7 @@ export default function Home() {
           const full = `${first} ${last}`.trim() || 'User';
           setProfileName(full);
           if (data.profile.photoDataUrl) setProfilePic(data.profile.photoDataUrl);
-          else setProfilePic(`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(full || 'User')}`);
+          else setProfilePic('/avatar-placeholder.png');
         }
       } catch {
         // ignore and keep defaults
@@ -87,19 +91,19 @@ export default function Home() {
         }}
       >
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0.9rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <Link href="/" style={{ fontWeight: 700, fontSize: '1.15rem', letterSpacing: 0.2 }}>
-              Find Service Around
-            </Link>
-            <nav style={{ display: 'flex', gap: '1rem', marginLeft: 'auto', alignItems: 'center' }}>
-              <Link href="/home" style={{ color: '#0f172a' }}>
+          <Link href="/" style={{ fontWeight: 700, fontSize: '1.15rem', letterSpacing: 0.2 }}>
+            Find Service Around
+          </Link>
+          <nav style={{ display: 'flex', gap: '1rem', marginLeft: 'auto', alignItems: 'center' }}>
+            <Link href="/home" style={{ color: '#0f172a' }}>
               Browse
             </Link>
-              <Link href="/about" style={{ color: '#0f172a' }}>
-                About
-              </Link>
-              <Link href="/contact" style={{ color: '#0f172a' }}>
-                Contact
-              </Link>
+            <Link href="/about" style={{ color: '#0f172a' }}>
+              About
+            </Link>
+            <Link href="/contact" style={{ color: '#0f172a' }}>
+              Contact
+            </Link>
             {!isLoggedIn && (
               <Link
                 href="/login"
@@ -114,20 +118,91 @@ export default function Home() {
               </Link>
             )}
             {isLoggedIn && (
-              <Link href="/profile" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                <span style={{ fontWeight: 600, color: '#0f172a' }}>{profileName}</span>
-                <img
-                  src={profilePic}
-                  alt="Profile"
-                  width={36}
-                  height={36}
-                  style={{ borderRadius: '50%', border: '1px solid #e2e8f0' }}
-                />
-              </Link>
+              <div style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen((v) => !v)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.6rem',
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <span style={{ fontWeight: 600, color: '#0f172a' }}>{profileName}</span>
+                  <img
+                    src={profilePic}
+                    alt="Profile"
+                    width={36}
+                    height={36}
+                    style={{ borderRadius: '50%', border: '1px solid #e2e8f0', objectFit: 'cover' }}
+                  />
+                </button>
+                {menuOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      marginTop: 8,
+                      background: 'white',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: 12,
+                      boxShadow: '0 14px 40px rgba(15,23,42,0.12)',
+                      minWidth: 160,
+                      overflow: 'hidden',
+                      zIndex: 30,
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        router.push('/profile');
+                      }}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '0.85rem 1rem',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        color: '#0f172a',
+                      }}
+                    >
+                      Profile
+                    </button>
+                    <div style={{ height: 1, background: '#e2e8f0' }} />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        localStorage.removeItem('idToken');
+                        localStorage.removeItem('refreshToken');
+                        localStorage.removeItem('pendingVerificationEmail');
+                        setIsLoggedIn(false);
+                        setMenuOpen(false);
+                      }}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '0.85rem 1rem',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        color: '#0f172a',
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
-            </nav>
-          </div>
-        </header>
+          </nav>
+        </div>
+      </header>
 
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '3rem 1.5rem 4rem' }}>
         <section
