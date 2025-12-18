@@ -21,12 +21,32 @@ export default function ProfilePage() {
   const [postalCode, setPostalCode] = useState('');
   const [province, setProvince] = useState('');
   const [country, setCountry] = useState('');
+  const [latitude, setLatitude] = useState<number | ''>('');
+  const [longitude, setLongitude] = useState<number | ''>('');
+  const [categoryId, setCategoryId] = useState('');
+  const [jobId, setJobId] = useState('');
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [keywordSuggestion, setKeywordSuggestion] = useState('');
+  const [suggestStatus, setSuggestStatus] = useState<string | null>(null);
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
 
+  const [metaCategories, setMetaCategories] = useState<{ id: string; name: string }[]>([]);
+  const [metaJobs, setMetaJobs] = useState<{ id: string; name: string; categoryId: string }[]>([]);
+  const [metaKeywords, setMetaKeywords] = useState<{ id: string; name: string }[]>([]);
+
   useEffect(() => {
+    fetch('/api/meta')
+      .then((res) => res.json())
+      .then((data) => {
+        setMetaCategories(data.categories ?? []);
+        setMetaJobs(data.jobs ?? []);
+        setMetaKeywords((data.keywords ?? []).map((k: any) => ({ id: k.id ?? k.name, name: k.name })));
+      })
+      .catch(() => {});
+
     const token = typeof window !== 'undefined' ? localStorage.getItem('idToken') : null;
     if (!token) {
       setIsLoggedIn(false);
@@ -49,6 +69,11 @@ export default function ProfilePage() {
           setPostalCode(data.profile.postalCode ?? '');
           setProvince(data.profile.province ?? '');
           setCountry(data.profile.country ?? '');
+          setLatitude(typeof data.profile.latitude === 'number' ? data.profile.latitude : '');
+          setLongitude(typeof data.profile.longitude === 'number' ? data.profile.longitude : '');
+          setCategoryId(data.profile.categoryId ?? '');
+          setJobId(data.profile.jobId ?? '');
+          setKeywords(Array.isArray(data.profile.keywords) ? data.profile.keywords : []);
           setPhotoDataUrl(data.profile.photoDataUrl ?? null);
 
           const fullName = `${data.profile.firstName ?? ''} ${data.profile.lastName ?? ''}`.trim() || 'User';
@@ -91,6 +116,11 @@ export default function ProfilePage() {
           postalCode,
           province,
           country,
+          latitude: latitude === '' ? undefined : latitude,
+          longitude: longitude === '' ? undefined : longitude,
+          categoryId,
+          jobId,
+          keywords,
           photoDataUrl,
         }),
       });
@@ -354,12 +384,150 @@ export default function ProfilePage() {
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
             <span>Country</span>
             <input
-              type="text"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
+            type="text"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+          />
+        </label>
+
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            <span>Latitude</span>
+            <input
+              type="number"
+              value={latitude}
+              onChange={(e) => setLatitude(e.target.value === '' ? '' : Number(e.target.value))}
               style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
             />
           </label>
+
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            <span>Longitude</span>
+            <input
+              type="number"
+              value={longitude}
+              onChange={(e) => setLongitude(e.target.value === '' ? '' : Number(e.target.value))}
+              style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+            />
+          </label>
+
+          {accountType === 'provider' && (
+            <>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <span>Category</span>
+                <select
+                  value={categoryId}
+                  onChange={(e) => {
+                    setCategoryId(e.target.value);
+                    setJobId('');
+                  }}
+                  style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+                >
+                  <option value="">Select a category</option>
+                  {metaCategories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <span>Job</span>
+                <select
+                  value={jobId}
+                  onChange={(e) => setJobId(e.target.value)}
+                  style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+                  disabled={!categoryId}
+                >
+                  <option value="">Select a job</option>
+                  {metaJobs
+                    .filter((j) => !categoryId || j.categoryId === categoryId)
+                    .map((j) => (
+                      <option key={j.id} value={j.id}>
+                        {j.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: '1 / -1' }}>
+                <span>Keywords (approved)</span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+                  {metaKeywords.map((k) => {
+                    const checked = keywords.includes(k.id);
+                    return (
+                      <label
+                        key={k.id}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                          padding: '0.35rem 0.55rem',
+                          borderRadius: 10,
+                          border: checked ? '1px solid #0f172a' : '1px solid #cbd5e1',
+                          background: checked ? 'rgba(15,23,42,0.06)' : 'white',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => {
+                            if (e.target.checked) setKeywords([...keywords, k.id]);
+                            else setKeywords(keywords.filter((kw) => kw !== k.id));
+                          }}
+                        />
+                        {k.name}
+                      </label>
+                    );
+                  })}
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <input
+                    type="text"
+                    value={keywordSuggestion}
+                    onChange={(e) => setKeywordSuggestion(e.target.value)}
+                    placeholder="Suggest a new keyword"
+                    style={{ flex: '1 1 200px', padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!keywordSuggestion.trim()) return;
+                      setSuggestStatus(null);
+                      try {
+                        const res = await fetch('/api/meta/keywords', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ name: keywordSuggestion }),
+                        });
+                        const data = await res.json();
+                        if (!res.ok) setSuggestStatus(data.error ?? 'Failed to submit keyword');
+                        else setSuggestStatus('Keyword suggestion submitted for review');
+                        setKeywordSuggestion('');
+                      } catch {
+                        setSuggestStatus('Failed to submit keyword');
+                      }
+                    }}
+                    style={{
+                      padding: '0.95rem 1.35rem',
+                      borderRadius: 12,
+                      border: 'none',
+                      background: '#0f172a',
+                      color: 'white',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      boxShadow: '0 16px 40px rgba(15,23,42,0.18)',
+                    }}
+                  >
+                    Suggest keyword
+                  </button>
+                </div>
+                {suggestStatus && <span style={{ color: '#475569' }}>{suggestStatus}</span>}
+              </div>
+            </>
+          )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <span>Profile picture</span>

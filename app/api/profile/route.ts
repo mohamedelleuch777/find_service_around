@@ -33,10 +33,14 @@ export async function POST(request: Request) {
     province: body.province ?? '',
     country: body.country ?? '',
     photoDataUrl: body.photoDataUrl ?? '',
+    latitude: body.latitude === undefined || body.latitude === '' ? null : Number(body.latitude),
+    longitude: body.longitude === undefined || body.longitude === '' ? null : Number(body.longitude),
+    categoryId: body.categoryId ?? '',
+    jobId: body.jobId ?? '',
+    keywords: Array.isArray(body.keywords) ? body.keywords : [],
     updatedAt: Date.now(),
   };
 
-  // Remove undefined to avoid Firestore errors.
   const cleaned: Record<string, unknown> = {};
   Object.entries(payload).forEach(([k, v]) => {
     cleaned[k] = clean(v);
