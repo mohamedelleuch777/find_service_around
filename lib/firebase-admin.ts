@@ -28,6 +28,10 @@ function initAdmin() {
   );
 }
 
+export function getAdminApp() {
+  return initAdmin();
+}
+
 export function getAuthAdmin() {
   const app = initAdmin();
   return getAuth(app);
