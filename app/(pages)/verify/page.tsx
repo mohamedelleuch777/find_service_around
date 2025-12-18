@@ -68,39 +68,61 @@ export default function VerifyPage() {
   };
 
   return (
-    <main style={{ padding: '2rem 1.5rem', maxWidth: 480, margin: '0 auto' }}>
-      <h1 style={{ margin: '0 0 1rem' }}>Verify your email</h1>
-      <p style={{ color: '#475569', marginBottom: '1rem' }}>
-        We’ve sent a verification email with a link to confirm your account.
-      </p>
-      <p style={{ color: '#475569', marginBottom: '1.5rem' }}>
-        Please check your inbox (and spam). When you click the link, you’ll be verified. If you don’t receive it, you
-        can resend after the timer ends.
-      </p>
+    <main
+      style={{
+        minHeight: '100vh',
+        background: 'radial-gradient(circle at 20% 20%, rgba(14,165,233,0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(16,185,129,0.12), transparent 30%), #f7f9fb',
+        display: 'grid',
+        placeItems: 'center',
+        padding: '2rem 1.5rem',
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          maxWidth: 520,
+          background: 'rgba(255,255,255,0.65)',
+          backdropFilter: 'blur(8px)',
+          borderRadius: 18,
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 24px 50px rgba(15,23,42,0.1)',
+          padding: '1.75rem',
+        }}
+      >
+        <h1 style={{ margin: '0 0 0.5rem', fontSize: '2rem' }}>Verify your email</h1>
+        <p style={{ color: '#475569', marginBottom: '1rem' }}>
+          We’ve sent a verification email with a link to confirm your account.
+        </p>
+        <p style={{ color: '#475569', marginBottom: '1.5rem' }}>
+          Please check your inbox (and spam). When you click the link, you’ll be verified. If you don’t receive it, you
+          can resend after the timer ends.
+        </p>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <button
-          type="button"
-          onClick={onResend}
-          disabled={!canResend || sending}
-          style={{
-            padding: '0.85rem 1rem',
-            borderRadius: 10,
-            border: 'none',
-            background: canResend ? '#0f172a' : '#94a3b8',
-            color: 'white',
-            fontWeight: 600,
-            cursor: canResend ? 'pointer' : 'not-allowed',
-          }}
-        >
-          {sending ? 'Resending...' : 'Resend email'}
-        </button>
-        {!canResend && <span style={{ color: '#475569' }}>Available in {minutesSeconds}</span>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button
+            type="button"
+            onClick={onResend}
+            disabled={!canResend || sending}
+            style={{
+              padding: '0.95rem 1.1rem',
+              borderRadius: 12,
+              border: 'none',
+              background: canResend ? '#0f172a' : '#94a3b8',
+              color: 'white',
+              fontWeight: 700,
+              cursor: canResend ? 'pointer' : 'not-allowed',
+              boxShadow: '0 16px 40px rgba(15,23,42,0.18)',
+            }}
+          >
+            {sending ? 'Resending...' : 'Resend email'}
+          </button>
+          {!canResend && <span style={{ color: '#475569' }}>Available in {minutesSeconds}</span>}
+        </div>
+
+        {status && (
+          <div style={{ marginTop: '1rem', padding: '0.85rem', borderRadius: 10, background: '#e2e8f0' }}>{status}</div>
+        )}
       </div>
-
-      {status && (
-        <div style={{ marginTop: '1rem', padding: '0.85rem', borderRadius: 8, background: '#e2e8f0' }}>{status}</div>
-      )}
     </main>
   );
 }

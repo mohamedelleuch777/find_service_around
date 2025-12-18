@@ -64,57 +64,79 @@ export default function LoginPage() {
   if (checking) return null;
 
   return (
-    <main style={{ padding: '2rem 1.5rem', maxWidth: 480, margin: '0 auto' }}>
-      <h1 style={{ margin: '0 0 1rem' }}>Login</h1>
-      <p style={{ color: '#475569', marginBottom: '1.5rem' }}>
-        Access your account to manage bookings and service listings.
-      </p>
+    <main
+      style={{
+        minHeight: '100vh',
+        background: 'radial-gradient(circle at 20% 20%, rgba(14,165,233,0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(16,185,129,0.12), transparent 30%), #f7f9fb',
+        display: 'grid',
+        placeItems: 'center',
+        padding: '2rem 1.5rem',
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          maxWidth: 520,
+          background: 'rgba(255,255,255,0.65)',
+          backdropFilter: 'blur(8px)',
+          borderRadius: 18,
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 24px 50px rgba(15,23,42,0.1)',
+          padding: '1.75rem',
+        }}
+      >
+        <h1 style={{ margin: '0 0 0.5rem', fontSize: '2rem' }}>Welcome back</h1>
+        <p style={{ color: '#475569', marginBottom: '1.5rem' }}>
+          Access your account to manage bookings and service listings.
+        </p>
 
-      <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-          <span>Email</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ padding: '0.75rem', borderRadius: 8, border: '1px solid #cbd5e1' }}
-          />
-        </label>
+        <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            <span>Email</span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+            />
+          </label>
 
-        <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-          <span>Password</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ padding: '0.75rem', borderRadius: 8, border: '1px solid #cbd5e1' }}
-          />
-        </label>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            <span>Password</span>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+            />
+          </label>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: '0.85rem',
-            borderRadius: 10,
-            border: 'none',
-            background: '#0f172a',
-            color: 'white',
-            fontWeight: 600,
-            cursor: 'pointer',
-          }}
-        >
-          {loading ? 'Signing in...' : 'Login'}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              padding: '0.95rem',
+              borderRadius: 12,
+              border: 'none',
+              background: '#0f172a',
+              color: 'white',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 16px 40px rgba(15,23,42,0.18)',
+            }}
+          >
+            {loading ? 'Signing in...' : 'Login'}
+          </button>
+        </form>
 
-      {status && (
-        <div style={{ marginTop: '1rem', padding: '0.85rem', borderRadius: 8, background: '#e2e8f0' }}>
-          {status}
-        </div>
-      )}
+        {status && (
+          <div style={{ marginTop: '1rem', padding: '0.85rem', borderRadius: 10, background: '#e2e8f0' }}>
+            {status}
+          </div>
+        )}
+      </div>
     </main>
   );
 }
