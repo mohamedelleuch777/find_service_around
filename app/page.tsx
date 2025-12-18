@@ -175,12 +175,14 @@ export default function Home() {
               alignItems: 'center',
             }}
           >
-            <div style={{ color: 'white' }}>
-              <div style={{ fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.8rem' }}>On-demand home services</div>
-              <p style={{ maxWidth: 520, margin: 0, opacity: 0.95, lineHeight: 1.6 }}>
+            <div style={{ color: 'white', position: 'relative', height: '100%', paddingBottom: '1.5rem' }}>
+              <div style={{ fontWeight: 800, fontSize: '2rem', marginBottom: '0.8rem', letterSpacing: -0.5 }}>
+                On-demand home services
+              </div>
+              <p style={{ maxWidth: 520, margin: 0, opacity: 0.95, lineHeight: 1.6, fontSize: '1.05rem' }}>
                 Plumbers, electricians, cleaners, HVAC, handymen, painters, babysitters, and more—book trusted pros in minutes.
               </p>
-              <div style={{ display: 'flex', gap: '0.35rem', marginTop: '1.25rem' }}>
+              <div style={{ position: 'absolute', bottom: 0, left: 0, display: 'flex', gap: '0.35rem' }}>
                 {sliderImages.map((_, idx) => (
                   <span
                     key={idx}
@@ -199,7 +201,8 @@ export default function Home() {
             <div
               style={{
                 marginLeft: 'auto',
-                background: 'rgba(255,255,255,0.96)',
+                background: 'rgba(255,255,255,0.25)',
+                backdropFilter: 'blur(5px)',
                 borderRadius: 20,
                 padding: '1.5rem',
                 maxWidth: 520,
