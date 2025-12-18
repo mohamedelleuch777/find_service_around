@@ -12,6 +12,8 @@ export default function ProfilePage() {
   const [profileName, setProfileName] = useState('Guest');
   const [profilePic, setProfilePic] = useState('/avatar-placeholder.png');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [resolvedUserId, setResolvedUserId] = useState<string | null>(null);
+  const [fallbackEmail, setFallbackEmail] = useState('');
   const [accountType, setAccountType] = useState<'user' | 'provider'>('user');
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -48,23 +50,56 @@ export default function ProfilePage() {
       })
       .catch(() => {});
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('idToken') : null;
-    if (!token) {
-      setIsLoggedIn(false);
-      router.replace('/login');
-      return;
-    }
-    setIsLoggedIn(true);
+    const resolveUser = async () => {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('idToken') : null;
+      if (!token) {
+        setIsLoggedIn(false);
+        router.replace('/login');
+        return;
+      }
+      setIsLoggedIn(true);
 
-    const userId = localStorage.getItem('profileUserId') || DEFAULT_USER_ID;
-    const fallbackEmail = typeof window !== 'undefined' ? localStorage.getItem('pendingVerificationEmail') || '' : '';
+      let userId = typeof window !== 'undefined' ? localStorage.getItem('profileUserId') : null;
+      let fEmail = typeof window !== 'undefined' ? localStorage.getItem('pendingVerificationEmail') || '' : '';
 
-    fetch(`/api/profile?userId=${encodeURIComponent(userId)}`)
+      if (!userId) {
+        try {
+          const res = await fetch('/api/auth/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken: token }),
+          });
+          const data = await res.json();
+          if (res.ok && data?.user?.id) {
+            userId = data.user.id;
+            localStorage.setItem('profileUserId', userId);
+            if (data.user.email) {
+              fEmail = data.user.email;
+              localStorage.setItem('pendingVerificationEmail', data.user.email);
+            }
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      setFallbackEmail(fEmail);
+      setEmail((prev) => prev || fEmail);
+      setResolvedUserId(userId || DEFAULT_USER_ID);
+    };
+
+    resolveUser();
+  }, [router]);
+
+  useEffect(() => {
+    if (!resolvedUserId) return;
+    const fEmail = fallbackEmail || (typeof window !== 'undefined' ? localStorage.getItem('pendingVerificationEmail') || '' : '');
+    fetch(`/api/profile?userId=${encodeURIComponent(resolvedUserId)}`)
       .then((res) => res.json())
       .then((data) => {
         if (data?.profile) {
           setAccountType(data.profile.accountType ?? 'user');
-          setEmail(data.profile.email ?? fallbackEmail);
+          setEmail(data.profile.email ?? fEmail);
           setFirstName(data.profile.firstName ?? '');
           setLastName(data.profile.lastName ?? '');
           setAge(typeof data.profile.age === 'number' ? data.profile.age : '');
@@ -85,11 +120,11 @@ export default function ProfilePage() {
           if (data.profile.photoDataUrl) setProfilePic(data.profile.photoDataUrl);
           else setProfilePic('/avatar-placeholder.png');
         } else {
-          setEmail(fallbackEmail);
+          setEmail(fEmail);
         }
       })
       .finally(() => setInitializing(false));
-  }, []);
+  }, [resolvedUserId, fallbackEmail]);
 
   const onImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -105,7 +140,7 @@ export default function ProfilePage() {
     event.preventDefault();
     setLoading(true);
     setStatus(null);
-    const userId = localStorage.getItem('profileUserId') || DEFAULT_USER_ID;
+    const userId = resolvedUserId || DEFAULT_USER_ID;
 
     try {
       const res = await fetch('/api/profile', {

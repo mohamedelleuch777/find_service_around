@@ -50,6 +50,9 @@ export default function RegisterPage() {
         return;
       }
 
+      if (data?.user?.id) {
+        localStorage.setItem('profileUserId', data.user.id);
+      }
       localStorage.setItem('idToken', data.tokens.idToken);
       localStorage.setItem('refreshToken', data.tokens.refreshToken);
       localStorage.setItem('pendingVerificationEmail', data.user.email);
@@ -138,6 +141,13 @@ export default function RegisterPage() {
             {status}
           </div>
         )}
+
+        <div style={{ marginTop: '1rem', color: '#475569', fontSize: '0.95rem' }}>
+          Already have an account?{' '}
+          <a href="/login" style={{ color: '#0f172a', fontWeight: 600 }}>
+            Log in
+          </a>
+        </div>
       </div>
     </main>
   );

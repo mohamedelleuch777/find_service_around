@@ -50,6 +50,9 @@ export default function LoginPage() {
         return;
       }
 
+      if (data?.user?.id) {
+        localStorage.setItem('profileUserId', data.user.id);
+      }
       localStorage.setItem('idToken', data.tokens.idToken);
       localStorage.setItem('refreshToken', data.tokens.refreshToken);
       setStatus(`Welcome back ${data.user.email}. Redirecting...`);
@@ -136,6 +139,15 @@ export default function LoginPage() {
             {status}
           </div>
         )}
+
+        <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between', color: '#475569', fontSize: '0.95rem' }}>
+          <a href="/register" style={{ color: '#0f172a', fontWeight: 600 }}>
+            Create an account
+          </a>
+          <a href="/forgot-password" style={{ color: '#0f172a', fontWeight: 600 }}>
+            Forgot password?
+          </a>
+        </div>
       </div>
     </main>
   );
