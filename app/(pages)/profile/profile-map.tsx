@@ -13,6 +13,21 @@ type Props = {
 };
 
 const DEFAULT_CENTER: [number, number] = [33.8869, 9.5375];
+let leafletSingleton: any = null;
+let markerIconSingleton: any = null;
+
+function getLeaflet() {
+  if (leafletSingleton) return leafletSingleton;
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const L = require('leaflet');
+  markerIconSingleton = L.divIcon({
+    className: 'profile-map-pin',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  });
+  leafletSingleton = L;
+  return L;
+}
 
 export default function ProfileMap({ latitude, longitude, viewLat, viewLon, onSelect }: Props) {
   const mapRef = useRef<any>(null);
@@ -26,15 +41,7 @@ export default function ProfileMap({ latitude, longitude, viewLat, viewLon, onSe
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const L = require('leaflet');
-
-    // Fix missing marker icons when bundled.
-    delete (L.Icon.Default.prototype as any)._getIconUrl;
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    });
+    const L = getLeaflet();
 
     if (!mapRef.current && containerRef.current) {
       mapRef.current = L.map(containerRef.current, {
@@ -53,7 +60,7 @@ export default function ProfileMap({ latitude, longitude, viewLat, viewLon, onSe
         if (markerRef.current) {
           markerRef.current.setLatLng([lat, lon]);
         } else {
-          markerRef.current = L.marker([lat, lon]).addTo(mapRef.current);
+          markerRef.current = L.marker([lat, lon], markerIconSingleton ? { icon: markerIconSingleton } : undefined).addTo(mapRef.current);
         }
         onSelectRef.current(lat, lon);
       });
@@ -62,12 +69,15 @@ export default function ProfileMap({ latitude, longitude, viewLat, viewLon, onSe
 
   useEffect(() => {
     if (!mapRef.current) return;
-    const L = require('leaflet');
+    const L = getLeaflet();
     if (latitude !== undefined && latitude !== '' && longitude !== undefined && longitude !== '') {
       if (markerRef.current) {
         markerRef.current.setLatLng([Number(latitude), Number(longitude)]);
       } else {
-        markerRef.current = L.marker([Number(latitude), Number(longitude)]).addTo(mapRef.current);
+        markerRef.current = L.marker(
+          [Number(latitude), Number(longitude)],
+          markerIconSingleton ? { icon: markerIconSingleton } : undefined
+        ).addTo(mapRef.current);
       }
     }
   }, [latitude, longitude]);

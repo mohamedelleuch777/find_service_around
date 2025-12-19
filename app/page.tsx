@@ -24,7 +24,7 @@ export default function Home() {
   const [slide, setSlide] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileName, setProfileName] = useState('Guest');
-  const [profilePic, setProfilePic] = useState('/avatar-placeholder.png');
+  const [profilePic, setProfilePic] = useState('/avatar-placeholder.svg');
   const [menuOpen, setMenuOpen] = useState(false);
   const [content, setContent] = useState<HomeContent | null>(null);
 
@@ -61,7 +61,7 @@ export default function Home() {
           const full = `${first} ${last}`.trim() || 'User';
           setProfileName(full);
           if (data.profile.photoDataUrl) setProfilePic(data.profile.photoDataUrl);
-          else setProfilePic('/avatar-placeholder.png');
+          else setProfilePic('/avatar-placeholder.svg');
         }
       } catch {
         // ignore and keep defaults
@@ -220,7 +220,7 @@ export default function Home() {
           <div style={{ position: 'absolute', inset: 0 }}>
             {content?.sliderImages?.map((src, idx) => (
               <img
-                key={src}
+                key={`${src}-${idx}`}
                 src={src}
                 alt="Home service highlight"
                 style={{
@@ -264,7 +264,7 @@ export default function Home() {
               <div style={{ position: 'absolute', bottom: 0, left: 0, display: 'flex', gap: '0.35rem' }}>
                 {content?.sliderImages?.map((_, idx) => (
                   <span
-                    key={idx}
+                    key={`dot-${idx}`}
                     style={{
                       width: 28,
                       height: 6,
@@ -328,9 +328,9 @@ export default function Home() {
                 </button>
               </div>
               <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
-                {content?.highlights?.map((item) => (
+                {content?.highlights?.map((item, idx) => (
                   <div
-                    key={item.label}
+                    key={`${item.label}-${idx}`}
                     style={{
                       padding: '0.85rem 1rem',
                       background: '#fff',
@@ -359,9 +359,9 @@ export default function Home() {
             </Link>
           </div>
           <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))' }}>
-            {content?.categories?.map((cat) => (
+            {content?.categories?.map((cat, idx) => (
               <div
-                key={cat.title}
+                key={`${cat.title}-${idx}`}
                 style={{
                   padding: '1rem',
                   background: '#fff',

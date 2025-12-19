@@ -13,7 +13,7 @@ export default function ProfilePage() {
   const defaultCountry = process.env.NEXT_PUBLIC_DEFAULT_COUNTRY || 'Tunisia';
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileName, setProfileName] = useState('Guest');
-  const [profilePic, setProfilePic] = useState('/avatar-placeholder.png');
+  const [profilePic, setProfilePic] = useState('/avatar-placeholder.svg');
   const [menuOpen, setMenuOpen] = useState(false);
   const [resolvedUserId, setResolvedUserId] = useState<string | null>(null);
   const [fallbackEmail, setFallbackEmail] = useState('');
@@ -168,7 +168,7 @@ export default function ProfilePage() {
           const fullName = `${data.profile.firstName ?? ''} ${data.profile.lastName ?? ''}`.trim() || 'User';
           setProfileName(fullName);
           if (data.profile.photoDataUrl) setProfilePic(data.profile.photoDataUrl);
-          else setProfilePic('/avatar-placeholder.png');
+          else setProfilePic('/avatar-placeholder.svg');
         } else {
           setEmail(fEmail);
           setCountry(defaultCountry);
