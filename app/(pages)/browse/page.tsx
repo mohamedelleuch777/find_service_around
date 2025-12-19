@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
+import SiteHeader from '../../components/site-header';
 
 const BrowseMap = dynamic(() => import('./browse-map'), { ssr: false });
 
@@ -98,33 +98,7 @@ export default function BrowsePage() {
 
   return (
     <div style={{ background: 'radial-gradient(circle at 20% 20%, rgba(14,165,233,0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(16,185,129,0.12), transparent 30%), #f7f9fb', minHeight: '100vh' }}>
-      <header
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 20,
-          backdropFilter: 'blur(12px)',
-          background: 'rgba(247,249,251,0.9)',
-          borderBottom: '1px solid #e2e8f0',
-        }}
-      >
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0.9rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <Link href="/" style={{ fontWeight: 700, fontSize: '1.15rem', letterSpacing: 0.2 }}>
-            Find Service Around
-          </Link>
-          <nav style={{ display: 'flex', gap: '1rem', marginLeft: 'auto', alignItems: 'center' }}>
-            <Link href="/home" style={{ color: '#0f172a' }}>
-              Browse
-            </Link>
-            <Link href="/about" style={{ color: '#0f172a' }}>
-              About
-            </Link>
-            <Link href="/contact" style={{ color: '#0f172a' }}>
-              Contact
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1.5rem 3rem', display: 'grid', gap: '1.5rem', gridTemplateColumns: '320px 1fr' }}>
         <div
