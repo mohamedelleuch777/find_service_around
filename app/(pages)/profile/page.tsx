@@ -61,6 +61,9 @@ export default function ProfilePage() {
   const [newFolderName, setNewFolderName] = useState('');
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newImageCaption, setNewImageCaption] = useState('');
+  const [ratingAvg, setRatingAvg] = useState<number | null>(null);
+  const [ratingCount, setRatingCount] = useState<number>(0);
+  const [reviewCount, setReviewCount] = useState<number>(0);
 
   useEffect(() => {
     fetch('/api/meta')
@@ -172,6 +175,9 @@ export default function ProfilePage() {
           setKeywords(Array.isArray(data.profile.keywords) ? data.profile.keywords : []);
           setPhotoDataUrl(data.profile.photoDataUrl ?? null);
           if (Array.isArray(data.profile.folders)) setFolders(data.profile.folders);
+          setRatingAvg(typeof data.profile.ratingAvg === 'number' ? data.profile.ratingAvg : null);
+          setRatingCount(data.profile.ratingCount ?? 0);
+          setReviewCount(data.profile.reviewCount ?? 0);
 
           const fullName = `${data.profile.firstName ?? ''} ${data.profile.lastName ?? ''}`.trim() || 'User';
           setProfileName(fullName);
@@ -326,6 +332,16 @@ export default function ProfilePage() {
         <p style={{ color: '#475569', marginBottom: '1.5rem' }}>
           Set your account type and complete your personal details. Upload a profile picture to personalize your account.
         </p>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+          <div style={{ padding: '0.65rem 0.9rem', border: '1px solid #e2e8f0', borderRadius: 12, background: '#fff', boxShadow: '0 10px 30px rgba(15,23,42,0.08)' }}>
+            <div style={{ fontWeight: 700, color: '#0f172a' }}>
+              {ratingAvg !== null ? `${ratingAvg.toFixed(1)} / 5` : 'Unrated'}
+            </div>
+            <div style={{ color: '#475569' }}>
+              {ratingCount} rating{ratingCount === 1 ? '' : 's'} • {reviewCount} review{reviewCount === 1 ? '' : 's'}
+            </div>
+          </div>
+        </div>
 
         <form
           onSubmit={onSubmit}
