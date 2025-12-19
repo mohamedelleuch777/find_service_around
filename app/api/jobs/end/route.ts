@@ -19,7 +19,14 @@ export async function POST(req: NextRequest) {
   if (!snap.exists) return NextResponse.json({ error: 'Job not found' }, { status: 404 });
   const job = snap.data() as any;
 
-  const role = userId === job.clientId ? 'client' : userId === job.providerId ? 'provider' : null;
+  let role: 'client' | 'provider' | null = null;
+  if (userId === job.clientId) role = 'client';
+  else if (userId === job.providerId) role = 'provider';
+  else if (Array.isArray(job.participants)) {
+    if (job.participants[0] === userId) role = 'client';
+    else if (job.participants[1] === userId) role = 'provider';
+    else if (job.participants.includes(userId)) role = 'client';
+  }
   if (!role) return NextResponse.json({ error: 'Only job participants can end the job' }, { status: 403 });
   if (job.status !== 'in_progress') return NextResponse.json({ error: 'Job not in progress' }, { status: 400 });
 
