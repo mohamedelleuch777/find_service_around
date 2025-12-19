@@ -62,10 +62,12 @@ function ProfilePageInner() {
   const [newFolderName, setNewFolderName] = useState('');
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newImageCaption, setNewImageCaption] = useState('');
-const [ratingAvg, setRatingAvg] = useState<number | null>(null);
-const [ratingCount, setRatingCount] = useState<number>(0);
-const [reviewCount, setReviewCount] = useState<number>(0);
+  const [ratingAvg, setRatingAvg] = useState<number | null>(null);
+  const [ratingCount, setRatingCount] = useState<number>(0);
+  const [reviewCount, setReviewCount] = useState<number>(0);
   const targetUserId = searchParams?.get('userId') || resolvedUserId;
+  const headerName = targetUserId ? undefined : profileName;
+  const headerPhoto = targetUserId ? undefined : profilePic;
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('idToken') : null;
@@ -336,7 +338,7 @@ const [reviewCount, setReviewCount] = useState<number>(0);
 
   return (
     <>
-      <SiteHeader prefilledName={profileName} prefilledPhoto={photoDataUrl || profilePic} />
+      <SiteHeader prefilledName={headerName} prefilledPhoto={headerPhoto} />
 
       <main
         style={{
