@@ -59,6 +59,9 @@ export async function GET() {
       address: p.address || '',
       postalCode: p.postalCode || '',
       photoDataUrl: p.photoDataUrl || '',
+      ratingAvg: typeof p.ratingAvg === 'number' ? p.ratingAvg : p.ratingCount && p.ratingSum ? Math.round((p.ratingSum / p.ratingCount) * 10) / 10 : 0,
+      ratingCount: p.ratingCount || 0,
+      reviewCount: p.reviewCount || 0,
     };
   });
 
