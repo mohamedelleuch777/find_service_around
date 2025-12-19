@@ -30,10 +30,6 @@ export async function GET() {
   const db = getDb();
   const docRef = db.collection('homeContent').doc('default');
   const doc = await docRef.get();
-  if (!doc.exists) {
-    await docRef.set(defaultContent);
-    return NextResponse.json(defaultContent);
-  }
   const data = doc.data() || {};
 
   const normalizeArray = (value: unknown) => {

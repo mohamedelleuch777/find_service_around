@@ -359,9 +359,11 @@ export default function Home() {
             </Link>
           </div>
           <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))' }}>
-            {content?.categories?.map((cat, idx) => (
+            {content?.categories?.map((cat, idx) => {
+              const label = (cat as any).title || (cat as any).name || 'Category';
+              return (
               <div
-                key={`${cat.title}-${idx}`}
+                key={`${label}-${idx}`}
                 style={{
                   padding: '1rem',
                   background: '#fff',
@@ -374,11 +376,12 @@ export default function Home() {
                 }}
               >
                 <div style={{ width: 54, height: 54, borderRadius: 12, background: '#f5f5f5', display: 'grid', placeItems: 'center' }}>
-                  <img src={cat.image} alt={cat.title} width={34} height={34} />
+                  <img src={(cat as any).image} alt={label} width={34} height={34} />
                 </div>
-                <div style={{ fontWeight: 700 }}>{cat.title}</div>
+                <div style={{ fontWeight: 700 }}>{label}</div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
