@@ -303,9 +303,16 @@ export default function BrowsePage() {
                       </div>
                     </div>
                   </div>
-                  <div style={{ color: '#475569' }}>
-                    {p.city || p.province || p.country} {p.postalCode ? `• ${p.postalCode}` : ''}
+                <div style={{ color: '#475569' }}>
+                  {p.city || p.province || p.country} {p.postalCode ? `• ${p.postalCode}` : ''}
+                </div>
+                {p.phone && (
+                  <div style={{ color: '#0f172a', fontWeight: 600 }}>
+                    {p.phone}
                   </div>
+                )}
+                <div style={{ color: '#475569' }}>
+                </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
                     {[p.categoryName, p.jobName, ...p.keywords].filter(Boolean).map((tag) => (
                       <span

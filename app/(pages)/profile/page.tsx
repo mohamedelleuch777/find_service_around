@@ -26,6 +26,7 @@ export default function ProfilePage() {
   const [postalCode, setPostalCode] = useState('');
   const [province, setProvince] = useState('');
   const [country, setCountry] = useState(defaultCountry);
+  const [phone, setPhone] = useState('');
   const [countries, setCountries] = useState<
     { id: string; name: string; value: string; delegations: { name: string; value: string; postalCode: string; latitude: number | null; longitude: number | null }[] }[]
   >([]);
@@ -55,6 +56,11 @@ export default function ProfilePage() {
   const [metaCategories, setMetaCategories] = useState<{ id: string; name: string }[]>([]);
   const [metaJobs, setMetaJobs] = useState<{ id: string; name: string; categoryId: string }[]>([]);
   const [metaKeywords, setMetaKeywords] = useState<{ id: string; name: string }[]>([]);
+  const [folders, setFolders] = useState<{ id: string; name: string; images: { id: string; url: string; caption?: string }[] }[]>([]);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [newImageUrl, setNewImageUrl] = useState('');
+  const [newImageCaption, setNewImageCaption] = useState('');
 
   useEffect(() => {
     fetch('/api/meta')
@@ -149,6 +155,7 @@ export default function ProfilePage() {
         if (data?.profile) {
           setAccountType(data.profile.accountType ?? 'user');
           setEmail(data.profile.email ?? fEmail);
+          setPhone(data.profile.phone ?? '');
           setFirstName(data.profile.firstName ?? '');
           setLastName(data.profile.lastName ?? '');
           setAge(typeof data.profile.age === 'number' ? data.profile.age : '');
@@ -157,12 +164,14 @@ export default function ProfilePage() {
           setPostalCode(data.profile.postalCode ?? '');
           setProvince(data.profile.province ?? '');
           setCountry(data.profile.country ?? defaultCountry);
+          setPhone(data.profile.phone ?? '');
           setLatitude(typeof data.profile.latitude === 'number' ? data.profile.latitude : '');
           setLongitude(typeof data.profile.longitude === 'number' ? data.profile.longitude : '');
           setCategoryId(data.profile.categoryId ?? '');
           setJobId(data.profile.jobId ?? '');
           setKeywords(Array.isArray(data.profile.keywords) ? data.profile.keywords : []);
           setPhotoDataUrl(data.profile.photoDataUrl ?? null);
+          if (Array.isArray(data.profile.folders)) setFolders(data.profile.folders);
 
           const fullName = `${data.profile.firstName ?? ''} ${data.profile.lastName ?? ''}`.trim() || 'User';
           setProfileName(fullName);
@@ -224,6 +233,21 @@ export default function ProfilePage() {
     reader.readAsDataURL(file);
   };
 
+  useEffect(() => {
+    if (!resolvedUserId) return;
+    const loadGallery = async () => {
+      try {
+        const res = await fetch(`/api/gallery?userId=${encodeURIComponent(resolvedUserId)}`);
+        const data = await res.json();
+        setFolders(data.folders || []);
+        if (data.folders?.length && !selectedFolderId) setSelectedFolderId(data.folders[0].id);
+      } catch {
+        // ignore
+      }
+    };
+    loadGallery();
+  }, [resolvedUserId, selectedFolderId]);
+
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
@@ -246,26 +270,28 @@ export default function ProfilePage() {
           postalCode,
           province,
           country,
+          phone,
           latitude: latitude === '' ? undefined : latitude,
           longitude: longitude === '' ? undefined : longitude,
           categoryId,
           jobId,
           keywords,
+          folders,
           photoDataUrl,
         }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setStatus(data.error ?? 'Failed to save profile');
-      } else {
-        setStatus('Profile saved');
+          setStatus(data.error ?? 'Failed to save profile');
+        } else {
+          setStatus('Profile saved');
+        }
+      } catch (error) {
+        setStatus('Unexpected error');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      setStatus('Unexpected error');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
   const locationLabel = latitude !== '' && longitude !== '' ? `${latitude}, ${longitude}` : city || province || country;
 
@@ -312,6 +338,16 @@ export default function ProfilePage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+            />
+          </label>
+
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            <span>Phone</span>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
             />
           </label>
@@ -497,6 +533,128 @@ export default function ProfilePage() {
                 setViewLon(lon);
               }}
             />
+          </div>
+
+          <div style={{ gridColumn: '1 / -1', display: 'grid', gap: '0.75rem', marginTop: '0.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <h3 style={{ margin: 0 }}>Gallery</h3>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <input
+                  type="text"
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  placeholder="New folder name"
+                  style={{ padding: '0.65rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+                />
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!resolvedUserId || !newFolderName.trim()) return;
+                    try {
+                      const res = await fetch('/api/gallery', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: resolvedUserId, action: 'add-folder', name: newFolderName }),
+                      });
+                      const data = await res.json();
+                      if (res.ok) {
+                        setFolders(data.folders || []);
+                        setSelectedFolderId(data.folders?.slice(-1)?.[0]?.id || null);
+                        setNewFolderName('');
+                      }
+                    } catch {
+                      // ignore
+                    }
+                  }}
+                  style={{ padding: '0.65rem 0.95rem', borderRadius: 10, border: '1px solid #0f172a', background: '#0f172a', color: 'white', cursor: 'pointer' }}
+                >
+                  Add folder
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {folders.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setSelectedFolderId(f.id)}
+                  style={{
+                    padding: '0.55rem 0.9rem',
+                    borderRadius: 10,
+                    border: f.id === selectedFolderId ? '2px solid #0f172a' : '1px solid #cbd5e1',
+                    background: f.id === selectedFolderId ? 'rgba(15,23,42,0.08)' : 'white',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {f.name}
+                </button>
+              ))}
+              {folders.length === 0 && <span style={{ color: '#475569' }}>No folders yet.</span>}
+            </div>
+
+            {selectedFolderId && (
+              <div style={{ display: 'grid', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <input
+                    type="url"
+                    value={newImageUrl}
+                    onChange={(e) => setNewImageUrl(e.target.value)}
+                    placeholder="Image URL"
+                    style={{ flex: '1 1 240px', padding: '0.65rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+                  />
+                  <input
+                    type="text"
+                    value={newImageCaption}
+                    onChange={(e) => setNewImageCaption(e.target.value)}
+                    placeholder="Caption (optional)"
+                    style={{ flex: '1 1 200px', padding: '0.65rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!resolvedUserId || !newImageUrl.trim()) return;
+                      try {
+                        const res = await fetch('/api/gallery', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            userId: resolvedUserId,
+                            action: 'add-image',
+                            folderId: selectedFolderId,
+                            url: newImageUrl,
+                            caption: newImageCaption,
+                          }),
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                          setFolders(data.folders || []);
+                          setNewImageUrl('');
+                          setNewImageCaption('');
+                        }
+                      } catch {
+                        // ignore
+                      }
+                    }}
+                    style={{ padding: '0.65rem 0.95rem', borderRadius: 10, border: '1px solid #0f172a', background: '#0f172a', color: 'white', cursor: 'pointer' }}
+                  >
+                    Add image
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+                  {(folders.find((f) => f.id === selectedFolderId)?.images || []).map((img) => (
+                    <div key={img.id} style={{ border: '1px solid #e2e8f0', borderRadius: 10, overflow: 'hidden', background: '#fff' }}>
+                      <img src={img.url} alt={img.caption || 'Gallery image'} style={{ width: '100%', height: 120, objectFit: 'cover' }} />
+                      {img.caption && <div style={{ padding: '0.45rem 0.6rem', fontSize: '0.9rem' }}>{img.caption}</div>}
+                    </div>
+                  ))}
+                  {(folders.find((f) => f.id === selectedFolderId)?.images || []).length === 0 && (
+                    <div style={{ color: '#475569' }}>No images in this folder.</div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {accountType === 'provider' && (

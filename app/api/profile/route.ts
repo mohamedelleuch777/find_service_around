@@ -33,6 +33,7 @@ export async function POST(request: Request) {
     postalCode: body.postalCode ?? '',
     province: body.province ?? '',
     country: body.country ?? '',
+    phone: body.phone ?? '',
     photoDataUrl: body.photoDataUrl ?? '',
     latitude: body.latitude === undefined || body.latitude === '' ? null : Number(body.latitude),
     longitude: body.longitude === undefined || body.longitude === '' ? null : Number(body.longitude),
