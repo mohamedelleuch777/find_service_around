@@ -71,23 +71,44 @@ export default function JobsPage() {
   const closed = useMemo(() => jobs.filter((j) => j.status === 'closed' || j.status === 'canceled'), [jobs]);
   const disputed = useMemo(() => jobs.filter((j) => j.status === 'disputed'), [jobs]);
 
-  const endJob = async () => {
-    if (!endForm.jobId || !currentUserId) return;
+  const endJob = async (jobId: string) => {
+    if (!jobId || !currentUserId) return;
+    const jobForEnd = jobs.find((j) => j.id === jobId);
+    const payloadReason = endForm.jobId === jobId ? endForm.reason : 'completed';
+    const payloadComment = endForm.jobId === jobId ? endForm.comment : '';
+    const payloadRating = endForm.jobId === jobId ? endForm.rating : '';
+    const fallbackStatus =
+      jobForEnd?.clientId === currentUserId
+        ? 'pending_provider'
+        : jobForEnd?.providerId === currentUserId
+        ? 'pending_client'
+        : 'pending_provider';
     try {
       const res = await fetch('/api/jobs/end', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          jobId: endForm.jobId,
+          jobId,
           userId: currentUserId,
-          reason: endForm.reason,
-          comment: endForm.comment,
-          rating: endForm.rating,
+          reason: payloadReason,
+          comment: payloadComment,
+          rating: payloadRating,
         }),
       });
       const data = await res.json();
       if (res.ok) {
-        setJobs(jobs.map((j) => (j.id === endForm.jobId ? { ...j, status: 'pending_provider', endRequest: data.job?.endRequest || j.endRequest } : j)));
+        setJobs(
+          jobs.map((j) =>
+            j.id === jobId
+              ? {
+                  ...j,
+                  ...(data.job || {}),
+                  status: data.job?.status || fallbackStatus,
+                  endRequest: data.job?.endRequest || j.endRequest,
+                }
+              : j
+          )
+        );
         setEndForm({ jobId: '', reason: 'completed', comment: '', rating: '' });
       } else {
         alert(data.error || 'Failed to end job');
@@ -143,7 +164,7 @@ export default function JobsPage() {
 
       {job.endRequest && (
         <div style={{ color: '#475569' }}>
-          Client ended: {job.endRequest.reason} {job.endRequest.comment ? `• ${job.endRequest.comment}` : ''}
+          {job.endRequest.by === 'provider' ? 'Provider' : 'Client'} ended: {job.endRequest.reason} {job.endRequest.comment ? `• ${job.endRequest.comment}` : ''}
           {job.endRequest.rating !== null && job.endRequest.rating !== undefined ? ` • Rating ${job.endRequest.rating}` : ''}
         </div>
       )}
@@ -160,7 +181,7 @@ export default function JobsPage() {
         </div>
       )}
 
-      {job.status === 'in_progress' && job.clientId === currentUserId && (
+      {job.status === 'in_progress' && (
         <div style={{ display: 'grid', gap: '0.4rem' }}>
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
             <span>Reason</span>
@@ -188,7 +209,7 @@ export default function JobsPage() {
             min={0}
             max={5}
             step={0.1}
-            placeholder="Rating (optional)"
+            placeholder={job.clientId === currentUserId ? 'Rate provider (optional)' : 'Rate client (optional)'}
             value={endForm.jobId === job.id ? endForm.rating : ''}
             onChange={(e) => setEndForm({ ...endForm, jobId: job.id, rating: e.target.value })}
             style={{ padding: '0.65rem', borderRadius: 10, border: '1px solid #cbd5e1', width: 180 }}
@@ -196,7 +217,7 @@ export default function JobsPage() {
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button
               type="button"
-              onClick={endJob}
+              onClick={() => endJob(job.id)}
               style={{ padding: '0.65rem 1rem', borderRadius: 10, border: '1px solid #0f172a', background: '#0f172a', color: 'white', cursor: 'pointer' }}
             >
               End job
@@ -344,7 +365,7 @@ export default function JobsPage() {
           <>
             {renderSection('In progress', inProgress)}
             {renderSection('Waiting on provider', pendingProvider)}
-            {renderSection('Waiting on you', pendingClient)}
+            {renderSection('Waiting on client', pendingClient)}
             {renderSection('Disputed', disputed)}
             {renderSection('Closed', closed)}
           </>
