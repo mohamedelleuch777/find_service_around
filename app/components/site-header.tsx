@@ -57,7 +57,7 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
       style={{
         position: 'sticky',
         top: 0,
-        zIndex: 20,
+        zIndex: 1000,
         backdropFilter: 'blur(12px)',
         background: 'rgba(247,249,251,0.9)',
         borderBottom: '1px solid #e2e8f0',
