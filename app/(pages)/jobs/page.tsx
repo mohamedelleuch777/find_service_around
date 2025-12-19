@@ -12,6 +12,8 @@ type Job = {
   endRequest?: any;
   counterRequest?: any;
   closure?: any;
+  acceptance?: any;
+  decline?: any;
   createdAt?: number;
   updatedAt?: number;
 };
@@ -68,7 +70,8 @@ export default function JobsPage() {
   const inProgress = useMemo(() => jobs.filter((j) => j.status === 'in_progress'), [jobs]);
   const pendingProvider = useMemo(() => jobs.filter((j) => j.status === 'pending_provider'), [jobs]);
   const pendingClient = useMemo(() => jobs.filter((j) => j.status === 'pending_client'), [jobs]);
-  const closed = useMemo(() => jobs.filter((j) => j.status === 'closed' || j.status === 'canceled'), [jobs]);
+  const awaitingAcceptance = useMemo(() => jobs.filter((j) => j.status === 'pending_provider_accept'), [jobs]);
+  const closed = useMemo(() => jobs.filter((j) => j.status === 'closed' || j.status === 'canceled' || j.status === 'declined'), [jobs]);
   const disputed = useMemo(() => jobs.filter((j) => j.status === 'disputed'), [jobs]);
 
   const endJob = async (jobId: string) => {
@@ -145,6 +148,25 @@ export default function JobsPage() {
     }
   };
 
+  const decideInvitation = async (jobId: string, action: 'accept' | 'refuse') => {
+    if (!jobId || !currentUserId) return;
+    try {
+      const res = await fetch('/api/jobs/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId, userId: currentUserId, action }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setJobs(jobs.map((j) => (j.id === jobId ? { ...j, ...data.job } : j)));
+      } else {
+        alert(data.error || 'Action failed');
+      }
+    } catch {
+      alert('Action failed');
+    }
+  };
+
   const renderJobCard = (job: Job) => (
     <div
       key={job.id}
@@ -162,6 +184,14 @@ export default function JobsPage() {
         <div style={{ color: '#475569' }}>Client: {job.clientId} • Provider: {job.providerId}</div>
       </div>
 
+      {job.status === 'pending_provider_accept' && (
+        <div style={{ color: '#0f172a', fontWeight: 600 }}>
+          Awaiting provider acceptance
+        </div>
+      )}
+      {job.acceptance && <div style={{ color: '#0f172a' }}>Accepted by provider</div>}
+      {job.decline && <div style={{ color: '#b91c1c' }}>Declined by provider</div>}
+
       {job.endRequest && (
         <div style={{ color: '#475569' }}>
           {job.endRequest.by === 'provider' ? 'Provider' : 'Client'} ended: {job.endRequest.reason} {job.endRequest.comment ? `• ${job.endRequest.comment}` : ''}
@@ -178,6 +208,25 @@ export default function JobsPage() {
         <div style={{ color: '#0f172a', fontWeight: 600 }}>
           Closed: {job.closure.reason} {job.closure.clientComment ? `• Client: ${job.closure.clientComment}` : ''}{' '}
           {job.closure.providerComment ? `• Provider: ${job.closure.providerComment}` : ''}
+        </div>
+      )}
+
+      {job.status === 'pending_provider_accept' && job.providerId === currentUserId && (
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={() => decideInvitation(job.id, 'accept')}
+            style={{ padding: '0.65rem 1rem', borderRadius: 10, border: '1px solid #0f172a', background: '#0f172a', color: 'white', cursor: 'pointer' }}
+          >
+            Accept job
+          </button>
+          <button
+            type="button"
+            onClick={() => decideInvitation(job.id, 'refuse')}
+            style={{ padding: '0.65rem 1rem', borderRadius: 10, border: '1px solid #cbd5e1', background: 'white', cursor: 'pointer' }}
+          >
+            Refuse job
+          </button>
         </div>
       )}
 
@@ -363,6 +412,7 @@ export default function JobsPage() {
           <div>Loading...</div>
         ) : (
           <>
+            {renderSection('Awaiting acceptance', awaitingAcceptance)}
             {renderSection('In progress', inProgress)}
             {renderSection('Waiting on provider', pendingProvider)}
             {renderSection('Waiting on client', pendingClient)}

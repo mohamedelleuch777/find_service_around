@@ -24,6 +24,7 @@ type Provider = {
   address: string;
   postalCode: string;
   photoDataUrl?: string;
+  providerWorkStatus?: string;
 };
 
 type Option = { id: string; name: string; categoryId?: string };
@@ -301,6 +302,9 @@ export default function BrowsePage() {
                       <div style={{ color: '#0f172a', fontWeight: 700 }}>
                         {p.ratingAvg ? `${p.ratingAvg.toFixed(1)} ★` : 'Unrated'} {p.ratingCount ? `(${p.ratingCount})` : ''}
                       </div>
+                      <div style={{ color: p.providerWorkStatus && p.providerWorkStatus !== 'available' ? '#b91c1c' : '#0f172a', fontWeight: 600 }}>
+                        Status: {p.providerWorkStatus ? p.providerWorkStatus.replace(/_/g, ' ') : 'available'}
+                      </div>
                     </div>
                   </div>
                 <div style={{ color: '#475569' }}>
@@ -332,26 +336,31 @@ export default function BrowsePage() {
                   <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.35rem', flexWrap: 'wrap' }}>
                     <button
                       type="button"
+                      disabled={p.providerWorkStatus && p.providerWorkStatus !== 'available'}
                       onClick={async (e) => {
                         e.stopPropagation();
                         if (!currentUserId) return;
+                        if (p.providerWorkStatus && p.providerWorkStatus !== 'available') {
+                          alert('Provider is not available right now.');
+                          return;
+                        }
                         try {
                           const res = await fetch('/api/jobs', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              clientId: currentUserId,
-                              providerId: p.id,
-                              categoryId: p.categoryId,
-                              jobId: p.jobId,
-                              title: p.jobName || p.categoryName,
-                            }),
-                          });
-                          const data = await res.json();
-                          if (res.ok) {
-                            setJobs([data.job, ...jobs]);
-                            alert('Job created with provider');
-                          } else {
+                          body: JSON.stringify({
+                            clientId: currentUserId,
+                            providerId: p.id,
+                            categoryId: p.categoryId,
+                            jobId: p.jobId,
+                            title: p.jobName || p.categoryName,
+                          }),
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                          setJobs([data.job, ...jobs]);
+                          alert('Job request sent to provider for acceptance');
+                        } else {
                             alert(data.error || 'Failed to hire');
                           }
                         } catch (err) {
@@ -362,13 +371,13 @@ export default function BrowsePage() {
                         padding: '0.65rem 0.9rem',
                         borderRadius: 10,
                         border: '1px solid #0f172a',
-                        background: '#0f172a',
-                        color: 'white',
+                        background: p.providerWorkStatus && p.providerWorkStatus !== 'available' ? '#cbd5e1' : '#0f172a',
+                        color: p.providerWorkStatus && p.providerWorkStatus !== 'available' ? '#475569' : 'white',
                         fontWeight: 700,
-                        cursor: 'pointer',
+                        cursor: p.providerWorkStatus && p.providerWorkStatus !== 'available' ? 'not-allowed' : 'pointer',
                       }}
                     >
-                      Hire
+                      {p.providerWorkStatus && p.providerWorkStatus !== 'available' ? 'Unavailable' : 'Hire'}
                     </button>
                     <button
                       type="button"
@@ -408,6 +417,9 @@ export default function BrowsePage() {
                   <div>
                     <div style={{ fontWeight: 800, fontSize: '1.2rem' }}>{`${selectedProvider.firstName} ${selectedProvider.lastName}`}</div>
                     <div style={{ color: '#475569' }}>{selectedProvider.jobName || selectedProvider.categoryName}</div>
+                    <div style={{ color: selectedProvider.providerWorkStatus && selectedProvider.providerWorkStatus !== 'available' ? '#b91c1c' : '#0f172a', fontWeight: 600 }}>
+                      Status: {selectedProvider.providerWorkStatus ? selectedProvider.providerWorkStatus.replace(/_/g, ' ') : 'available'}
+                    </div>
                   </div>
                   <button
                     type="button"

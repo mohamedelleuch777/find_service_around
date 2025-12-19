@@ -65,6 +65,7 @@ function ProfilePageInner() {
   const [ratingAvg, setRatingAvg] = useState<number | null>(null);
   const [ratingCount, setRatingCount] = useState<number>(0);
   const [reviewCount, setReviewCount] = useState<number>(0);
+  const [providerWorkStatus, setProviderWorkStatus] = useState('available');
   const targetUserId = searchParams?.get('userId') || resolvedUserId;
   const headerName = targetUserId ? undefined : profileName;
   const headerPhoto = targetUserId ? undefined : profilePic;
@@ -206,6 +207,7 @@ function ProfilePageInner() {
           setCategoryId(data.profile.categoryId ?? '');
           setJobId(data.profile.jobId ?? '');
           setKeywords(Array.isArray(data.profile.keywords) ? data.profile.keywords : []);
+          setProviderWorkStatus(data.profile.providerWorkStatus || 'available');
           setPhotoDataUrl(data.profile.photoDataUrl ?? null);
           if (Array.isArray(data.profile.folders)) setFolders(data.profile.folders);
           setRatingAvg(typeof data.profile.ratingAvg === 'number' ? data.profile.ratingAvg : null);
@@ -300,6 +302,7 @@ function ProfilePageInner() {
         body: JSON.stringify({
           userId,
           accountType,
+          providerWorkStatus,
           email,
           firstName,
           lastName,
@@ -708,6 +711,19 @@ function ProfilePageInner() {
 
           {accountType === 'provider' && (
             <>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <span>Work status</span>
+                <select
+                  value={providerWorkStatus}
+                  onChange={(e) => setProviderWorkStatus(e.target.value)}
+                  style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+                >
+                  <option value="available">Available</option>
+                  <option value="busy">Busy</option>
+                  <option value="away">Away / not taking jobs</option>
+                </select>
+              </label>
+
               <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <span>Category</span>
                 <select
