@@ -68,7 +68,7 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
           Find Service Around
         </Link>
         <nav style={{ display: 'flex', gap: '1rem', marginLeft: 'auto', alignItems: 'center' }}>
-          <Link href="/home" style={{ color: '#0f172a' }}>
+          <Link href="/browse" style={{ color: '#0f172a' }}>
             Browse
           </Link>
           <Link href="/about" style={{ color: '#0f172a' }}>
