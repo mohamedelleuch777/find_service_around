@@ -30,6 +30,12 @@ export default function ProfilePage() {
   const [countries, setCountries] = useState<
     { id: string; name: string; value: string; delegations: { name: string; value: string; postalCode: string; latitude: number | null; longitude: number | null }[] }[]
   >([]);
+  const [govMap, setGovMap] = useState<
+    Record<
+      string,
+      { name: string; value: string; delegations: { name: string; value: string; postalCode: string; latitude: number | null; longitude: number | null }[] }
+    >
+  >({});
   const [delegations, setDelegations] = useState<
     { name: string; value: string; postalCode: string; latitude: number | null; longitude: number | null }[]
   >([]);
@@ -64,7 +70,24 @@ export default function ProfilePage() {
     fetch('/api/country')
       .then((res) => res.json())
       .then((data) => {
-        setCountries(data.countries ?? []);
+        const list = data.countries ?? [];
+        setCountries(list);
+        const map: Record<
+          string,
+          { name: string; value: string; delegations: { name: string; value: string; postalCode: string; latitude: number | null; longitude: number | null }[] }
+        > = {};
+        list.forEach((c: any) => {
+          const keyName = (c.name || '').toLowerCase();
+          const keyVal = (c.value || '').toLowerCase();
+          const entry = {
+            name: c.name || c.value || '',
+            value: c.value || c.name || '',
+            delegations: Array.isArray(c.delegations) ? c.delegations : [],
+          };
+          if (keyName) map[keyName] = entry;
+          if (keyVal) map[keyVal] = entry;
+        });
+        setGovMap(map);
         if (!country) setCountry(defaultCountry);
       })
       .catch(() => {});
@@ -152,9 +175,9 @@ export default function ProfilePage() {
       return;
     }
     const selected = (province || '').toLowerCase();
-    const gov = countries.find((c) => (c.name || '').toLowerCase() === selected || (c.value || '').toLowerCase() === selected);
+    const gov = govMap[selected];
     setDelegations(gov?.delegations ?? []);
-  }, [countries, province]);
+  }, [govMap, province]);
 
   useEffect(() => {
     if (!city || !delegations.length) return;
@@ -483,11 +506,14 @@ export default function ProfilePage() {
               disabled={!province}
             >
               <option value="">Select a delegation</option>
-              {delegations.map((d) => (
-                <option key={`${d.value}-${d.postalCode}`} value={d.name || d.value}>
-                  {d.name || d.value} {d.postalCode ? `(${d.postalCode})` : ''}
-                </option>
-              ))}
+              {delegations.map((d, idx) => {
+                const optKey = `${d.value || d.name || 'deleg'}-${d.postalCode || 'pc'}-${idx}`;
+                return (
+                  <option key={optKey} value={d.name || d.value}>
+                    {d.name || d.value} {d.postalCode ? `(${d.postalCode})` : ''}
+                  </option>
+                );
+              })}
             </select>
           </label>
 
