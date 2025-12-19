@@ -1,15 +1,16 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import SiteHeader from '../../components/site-header';
 
 const DEFAULT_USER_ID = 'demo-user';
 const ProfileMap = dynamic(() => import('./profile-map'), { ssr: false });
 
-export default function ProfilePage() {
+function ProfilePageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const defaultCountry = process.env.NEXT_PUBLIC_DEFAULT_COUNTRY || 'Tunisia';
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileName, setProfileName] = useState('Guest');
@@ -61,9 +62,35 @@ export default function ProfilePage() {
   const [newFolderName, setNewFolderName] = useState('');
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newImageCaption, setNewImageCaption] = useState('');
-  const [ratingAvg, setRatingAvg] = useState<number | null>(null);
-  const [ratingCount, setRatingCount] = useState<number>(0);
-  const [reviewCount, setReviewCount] = useState<number>(0);
+const [ratingAvg, setRatingAvg] = useState<number | null>(null);
+const [ratingCount, setRatingCount] = useState<number>(0);
+const [reviewCount, setReviewCount] = useState<number>(0);
+  const targetUserId = searchParams?.get('userId') || resolvedUserId;
+
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('idToken') : null;
+    const paramUserId =
+      typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('userId') || searchParams?.get('userId') : searchParams?.get('userId');
+
+    if (paramUserId) {
+      setResolvedUserId(paramUserId);
+      setIsLoggedIn(!!token);
+      setInitializing(false);
+      return;
+    }
+
+    const userId = typeof window !== 'undefined' ? localStorage.getItem('profileUserId') || 'demo-user' : 'demo-user';
+    const pendingEmail = typeof window !== 'undefined' ? localStorage.getItem('pendingVerificationEmail') || '' : '';
+    if (!token) {
+      setIsLoggedIn(false);
+      router.replace('/login');
+      return;
+    }
+    setIsLoggedIn(true);
+    setResolvedUserId(userId);
+    setFallbackEmail(pendingEmail);
+    setInitializing(false);
+  }, [router, searchParams]);
 
   useEffect(() => {
     fetch('/api/meta')
@@ -109,6 +136,9 @@ export default function ProfilePage() {
       .catch(() => {});
 
     const resolveUser = async () => {
+      const urlUser = searchParams?.get('userId') || resolvedUserId;
+      if (urlUser && urlUser !== DEFAULT_USER_ID) return;
+
       const token = typeof window !== 'undefined' ? localStorage.getItem('idToken') : null;
       if (!token) {
         setIsLoggedIn(false);
@@ -147,12 +177,13 @@ export default function ProfilePage() {
     };
 
     resolveUser();
-  }, [router]);
+  }, [router, searchParams, resolvedUserId]);
 
   useEffect(() => {
-    if (!resolvedUserId) return;
+    const targetId = searchParams?.get('userId') || resolvedUserId;
+    if (!targetId) return;
     const fEmail = fallbackEmail || (typeof window !== 'undefined' ? localStorage.getItem('pendingVerificationEmail') || '' : '');
-    fetch(`/api/profile?userId=${encodeURIComponent(resolvedUserId)}`)
+    fetch(`/api/profile?userId=${encodeURIComponent(targetId)}`)
       .then((res) => res.json())
       .then((data) => {
         if (data?.profile) {
@@ -301,7 +332,7 @@ export default function ProfilePage() {
 
   const locationLabel = latitude !== '' && longitude !== '' ? `${latitude}, ${longitude}` : city || province || country;
 
-  if (initializing || !isLoggedIn) return null;
+  if (initializing) return null;
 
   return (
     <>
@@ -826,5 +857,13 @@ export default function ProfilePage() {
       </div>
     </main>
     </>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProfilePageInner />
+    </Suspense>
   );
 }

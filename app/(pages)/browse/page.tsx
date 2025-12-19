@@ -328,7 +328,8 @@ export default function BrowsePage() {
                       </span>
                     ))}
                   </div>
-                  {currentUserId && (
+                {currentUserId && (
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.35rem', flexWrap: 'wrap' }}>
                     <button
                       type="button"
                       onClick={async (e) => {
@@ -358,7 +359,6 @@ export default function BrowsePage() {
                         }
                       }}
                       style={{
-                        marginTop: '0.3rem',
                         padding: '0.65rem 0.9rem',
                         borderRadius: 10,
                         border: '1px solid #0f172a',
@@ -370,10 +370,29 @@ export default function BrowsePage() {
                     >
                       Hire
                     </button>
-                  )}
-                </div>
-              ))}
-            </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.location.href = `/profile?userId=${encodeURIComponent(p.id)}`;
+                      }}
+                      style={{
+                        padding: '0.65rem 0.9rem',
+                        borderRadius: 10,
+                        border: '1px solid #e2e8f0',
+                        background: 'white',
+                        color: '#0f172a',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      See profile
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
 
             {selectedProvider && (
               <div
