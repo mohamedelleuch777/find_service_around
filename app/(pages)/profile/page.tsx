@@ -466,7 +466,9 @@ export default function ProfilePage() {
               onChange={(e) => {
                 const val = e.target.value;
                 setCity(val);
-                const selected = delegations.find((d) => d.name === val || d.value === val);
+                const selected = delegations.find(
+                  (d) => (d.name || '').toLowerCase() === val.toLowerCase() || (d.value || '').toLowerCase() === val.toLowerCase()
+                );
                 if (selected) {
                   if (selected.latitude && selected.longitude) {
                     setLatitude(selected.latitude);
@@ -474,6 +476,7 @@ export default function ProfilePage() {
                     setViewLat(selected.latitude);
                     setViewLon(selected.longitude);
                   }
+                  if (selected.postalCode) setPostalCode(selected.postalCode);
                 }
               }}
               style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
@@ -506,6 +509,7 @@ export default function ProfilePage() {
                 const val = e.target.value;
                 setProvince(val);
                 setCity('');
+                setPostalCode('');
                 setLatitude('');
                 setLongitude('');
                 setViewLat(null);
