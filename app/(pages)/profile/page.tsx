@@ -70,7 +70,11 @@ export default function ProfilePage() {
     fetch('/api/country')
       .then((res) => res.json())
       .then((data) => {
-        const list = data.countries ?? [];
+        const list = (data.countries ?? []).slice().sort((a: any, b: any) => {
+          const an = (a.name || a.value || '').toLowerCase();
+          const bn = (b.name || b.value || '').toLowerCase();
+          return an.localeCompare(bn);
+        });
         setCountries(list);
         const map: Record<
           string,
@@ -82,7 +86,11 @@ export default function ProfilePage() {
           const entry = {
             name: c.name || c.value || '',
             value: c.value || c.name || '',
-            delegations: Array.isArray(c.delegations) ? c.delegations : [],
+            delegations: Array.isArray(c.delegations)
+              ? c.delegations
+                  .slice()
+                  .sort((d1: any, d2: any) => (d1.name || d1.value || '').toLowerCase().localeCompare((d2.name || d2.value || '').toLowerCase()))
+              : [],
           };
           if (keyName) map[keyName] = entry;
           if (keyVal) map[keyVal] = entry;
@@ -176,7 +184,12 @@ export default function ProfilePage() {
     }
     const selected = (province || '').toLowerCase();
     const gov = govMap[selected];
-    setDelegations(gov?.delegations ?? []);
+    const sortedDelegations = (gov?.delegations ?? []).slice().sort((a, b) => {
+      const an = (a.name || a.value || '').toLowerCase();
+      const bn = (b.name || b.value || '').toLowerCase();
+      return an.localeCompare(bn);
+    });
+    setDelegations(sortedDelegations);
   }, [govMap, province]);
 
   useEffect(() => {
@@ -508,9 +521,10 @@ export default function ProfilePage() {
               <option value="">Select a delegation</option>
               {delegations.map((d, idx) => {
                 const optKey = `${d.value || d.name || 'deleg'}-${d.postalCode || 'pc'}-${idx}`;
+                const label = d.name || d.value || 'Delegation';
                 return (
                   <option key={optKey} value={d.name || d.value}>
-                    {d.name || d.value} {d.postalCode ? `(${d.postalCode})` : ''}
+                    {idx + 1}. {label} {d.postalCode ? `(${d.postalCode})` : ''}
                   </option>
                 );
               })}
@@ -544,9 +558,9 @@ export default function ProfilePage() {
               style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
             >
               <option value="">Select a governorate</option>
-              {countries.map((c) => (
+              {countries.map((c, idx) => (
                 <option key={c.id} value={c.name || c.value}>
-                  {c.name || c.value}
+                  {idx + 1}. {c.name || c.value}
                 </option>
               ))}
             </select>
