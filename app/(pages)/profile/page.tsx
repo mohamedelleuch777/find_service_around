@@ -1,13 +1,16 @@
 'use client';
 
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 const DEFAULT_USER_ID = 'demo-user';
+const ProfileMap = dynamic(() => import('./profile-map'), { ssr: false });
 
 export default function ProfilePage() {
   const router = useRouter();
+  const defaultCountry = process.env.NEXT_PUBLIC_DEFAULT_COUNTRY || 'Tunisia';
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileName, setProfileName] = useState('Guest');
   const [profilePic, setProfilePic] = useState('/avatar-placeholder.png');
@@ -23,9 +26,17 @@ export default function ProfilePage() {
   const [city, setCity] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [province, setProvince] = useState('');
-  const [country, setCountry] = useState('');
+  const [country, setCountry] = useState(defaultCountry);
+  const [countries, setCountries] = useState<
+    { id: string; name: string; value: string; delegations: { name: string; value: string; postalCode: string; latitude: number | null; longitude: number | null }[] }[]
+  >([]);
+  const [delegations, setDelegations] = useState<
+    { name: string; value: string; postalCode: string; latitude: number | null; longitude: number | null }[]
+  >([]);
   const [latitude, setLatitude] = useState<number | ''>('');
   const [longitude, setLongitude] = useState<number | ''>('');
+  const [viewLat, setViewLat] = useState<number | null>(null);
+  const [viewLon, setViewLon] = useState<number | null>(null);
   const [categoryId, setCategoryId] = useState('');
   const [jobId, setJobId] = useState('');
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -47,6 +58,14 @@ export default function ProfilePage() {
         setMetaCategories(data.categories ?? []);
         setMetaJobs(data.jobs ?? []);
         setMetaKeywords((data.keywords ?? []).map((k: any) => ({ id: k.id ?? k.name, name: k.name })));
+      })
+      .catch(() => {});
+
+    fetch('/api/country')
+      .then((res) => res.json())
+      .then((data) => {
+        setCountries(data.countries ?? []);
+        if (!country) setCountry(defaultCountry);
       })
       .catch(() => {});
 
@@ -107,7 +126,7 @@ export default function ProfilePage() {
           setCity(data.profile.city ?? '');
           setPostalCode(data.profile.postalCode ?? '');
           setProvince(data.profile.province ?? '');
-          setCountry(data.profile.country ?? '');
+          setCountry(data.profile.country ?? defaultCountry);
           setLatitude(typeof data.profile.latitude === 'number' ? data.profile.latitude : '');
           setLongitude(typeof data.profile.longitude === 'number' ? data.profile.longitude : '');
           setCategoryId(data.profile.categoryId ?? '');
@@ -121,10 +140,44 @@ export default function ProfilePage() {
           else setProfilePic('/avatar-placeholder.png');
         } else {
           setEmail(fEmail);
+          setCountry(defaultCountry);
         }
       })
       .finally(() => setInitializing(false));
   }, [resolvedUserId, fallbackEmail]);
+
+  useEffect(() => {
+    if (!province) {
+      setDelegations([]);
+      return;
+    }
+    const selected = (province || '').toLowerCase();
+    const gov = countries.find((c) => (c.name || '').toLowerCase() === selected || (c.value || '').toLowerCase() === selected);
+    setDelegations(gov?.delegations ?? []);
+  }, [countries, province]);
+
+  useEffect(() => {
+    if (!city || !delegations.length) return;
+    const selected = delegations.find(
+      (d) => (d.name || '').toLowerCase() === (city || '').toLowerCase() || (d.value || '').toLowerCase() === (city || '').toLowerCase()
+    );
+    if (selected) {
+      if (selected.latitude && selected.longitude) {
+        setLatitude(selected.latitude);
+        setLongitude(selected.longitude);
+        setViewLat(selected.latitude);
+        setViewLon(selected.longitude);
+      }
+      if (selected.postalCode) setPostalCode(selected.postalCode);
+    }
+  }, [city, delegations]);
+
+  useEffect(() => {
+    if (latitude !== '' && longitude !== '') {
+      setViewLat(Number(latitude));
+      setViewLon(Number(longitude));
+    }
+  }, [latitude, longitude]);
 
   const onImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -178,6 +231,8 @@ export default function ProfilePage() {
       setLoading(false);
     }
   };
+
+  const locationLabel = latitude !== '' && longitude !== '' ? `${latitude}, ${longitude}` : city || province || country;
 
   if (initializing || !isLoggedIn) return null;
 
@@ -405,13 +460,32 @@ export default function ProfilePage() {
           </label>
 
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <span>City</span>
-            <input
-              type="text"
+            <span>Delegation</span>
+            <select
               value={city}
-              onChange={(e) => setCity(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setCity(val);
+                const selected = delegations.find((d) => d.name === val || d.value === val);
+                if (selected) {
+                  if (selected.latitude && selected.longitude) {
+                    setLatitude(selected.latitude);
+                    setLongitude(selected.longitude);
+                    setViewLat(selected.latitude);
+                    setViewLon(selected.longitude);
+                  }
+                }
+              }}
               style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
-            />
+              disabled={!province}
+            >
+              <option value="">Select a delegation</option>
+              {delegations.map((d) => (
+                <option key={`${d.value}-${d.postalCode}`} value={d.name || d.value}>
+                  {d.name || d.value} {d.postalCode ? `(${d.postalCode})` : ''}
+                </option>
+              ))}
+            </select>
           </label>
 
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
@@ -425,24 +499,28 @@ export default function ProfilePage() {
           </label>
 
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <span>Province</span>
-            <input
-              type="text"
+            <span>Governorate</span>
+            <select
               value={province}
-              onChange={(e) => setProvince(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setProvince(val);
+                setCity('');
+                setLatitude('');
+                setLongitude('');
+                setViewLat(null);
+                setViewLon(null);
+              }}
               style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
-            />
+            >
+              <option value="">Select a governorate</option>
+              {countries.map((c) => (
+                <option key={c.id} value={c.name || c.value}>
+                  {c.name || c.value}
+                </option>
+              ))}
+            </select>
           </label>
-
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <span>Country</span>
-            <input
-            type="text"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
-          />
-        </label>
 
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
             <span>Latitude</span>
@@ -463,6 +541,43 @@ export default function ProfilePage() {
               style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
             />
           </label>
+
+          <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <span style={{ fontWeight: 600 }}>Set your location</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setLatitude('');
+                  setLongitude('');
+                  setViewLat(null);
+                  setViewLon(null);
+                }}
+                style={{
+                  padding: '0.35rem 0.85rem',
+                  borderRadius: 10,
+                  border: '1px solid #cbd5e1',
+                  background: 'white',
+                  cursor: 'pointer',
+                }}
+              >
+                Reset
+              </button>
+              <span style={{ color: '#475569' }}>Using: {locationLabel || 'Not set'}</span>
+            </div>
+            <ProfileMap
+              latitude={latitude === '' ? undefined : Number(latitude)}
+              longitude={longitude === '' ? undefined : Number(longitude)}
+              viewLat={viewLat}
+              viewLon={viewLon}
+              onSelect={(lat, lon) => {
+                setLatitude(lat);
+                setLongitude(lon);
+                setViewLat(lat);
+                setViewLon(lon);
+              }}
+            />
+          </div>
 
           {accountType === 'provider' && (
             <>
