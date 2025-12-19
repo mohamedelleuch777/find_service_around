@@ -179,6 +179,20 @@ export default function JobsPage() {
   const showProvider = allJobs.some((j) => j.providerId !== currentUserId);
   const colCount = 4 + (showClient ? 1 : 0) + (showProvider ? 1 : 0);
 
+  const statusStyle = (status: string) => {
+    const styles: Record<string, { bg: string; color: string }> = {
+      in_progress: { bg: '#e0f2fe', color: '#0369a1' },
+      pending_provider: { bg: '#fef9c3', color: '#854d0e' },
+      pending_provider_accept: { bg: '#fef9c3', color: '#854d0e' },
+      pending_client: { bg: '#e0f2fe', color: '#0369a1' },
+      disputed: { bg: '#fee2e2', color: '#b91c1c' },
+      closed: { bg: '#dcfce7', color: '#166534' },
+      canceled: { bg: '#f1f5f9', color: '#0f172a' },
+      declined: { bg: '#f8fafc', color: '#334155' },
+    };
+    return styles[status] || { bg: '#f8fafc', color: '#0f172a' };
+  };
+
   const renderTable = (title: string, items: (Job & { section?: string })[]) => (
     <div
       style={{
@@ -245,7 +259,27 @@ export default function JobsPage() {
                   </td>
                   {showClient && <td style={{ padding: '0.9rem 0.65rem', color: '#475569' }}>{job.clientId}</td>}
                   {showProvider && <td style={{ padding: '0.9rem 0.65rem', color: '#475569' }}>{job.providerId}</td>}
-                  <td style={{ padding: '0.9rem 0.65rem', color: '#0f172a' }}>{job.status}</td>
+                  <td style={{ padding: '0.9rem 0.65rem', color: '#0f172a' }}>
+                    {(() => {
+                      const { bg, color } = statusStyle(job.status);
+                      return (
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            padding: '0.35rem 0.65rem',
+                            borderRadius: 10,
+                            background: bg,
+                            color,
+                            fontWeight: 700,
+                            textTransform: 'capitalize',
+                          }}
+                        >
+                          {job.status.replace(/_/g, ' ')}
+                        </span>
+                      );
+                    })()}
+                  </td>
                   <td style={{ padding: '0.9rem 0.65rem', minWidth: 240 }}>
                     {job.status === 'pending_provider_accept' && job.providerId === currentUserId && (
                       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
