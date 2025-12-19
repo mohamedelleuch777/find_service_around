@@ -17,6 +17,7 @@ type Props = {
   center: { lat: number; lon: number };
   markers: Marker[];
   onMarkerClick?: (marker: Marker) => void;
+  radiusKm?: number;
 };
 
 const DEFAULT_ZOOM = 8;
@@ -36,9 +37,11 @@ function getLeaflet() {
   return L;
 }
 
-export default function BrowseMap({ center, markers, onMarkerClick }: Props) {
+export default function BrowseMap({ center, markers, onMarkerClick, radiusKm }: Props) {
   const mapRef = useRef<any>(null);
   const markerLayerRef = useRef<any>(null);
+  const radiusRef = useRef<any>(null);
+  const centerMarkerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const clickRef = useRef(onMarkerClick);
 
@@ -85,6 +88,36 @@ export default function BrowseMap({ center, markers, onMarkerClick }: Props) {
     if (!mapRef.current) return;
     mapRef.current.setView([center.lat, center.lon], mapRef.current.getZoom() || DEFAULT_ZOOM);
   }, [center.lat, center.lon]);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const L = getLeaflet();
+    if (radiusRef.current) {
+      radiusRef.current.remove();
+      radiusRef.current = null;
+    }
+    if (centerMarkerRef.current) {
+      centerMarkerRef.current.remove();
+      centerMarkerRef.current = null;
+    }
+    if (radiusKm && radiusKm > 0) {
+      radiusRef.current = L.circle([center.lat, center.lon], {
+        radius: radiusKm * 1000,
+        color: '#0f172a',
+        weight: 1,
+        opacity: 0.4,
+        fillColor: '#0f172a',
+        fillOpacity: 0.12,
+      }).addTo(mapRef.current);
+      centerMarkerRef.current = L.circleMarker([center.lat, center.lon], {
+        radius: 6,
+        color: '#0f172a',
+        weight: 2,
+        fillColor: '#0f172a',
+        fillOpacity: 1,
+      }).addTo(mapRef.current);
+    }
+  }, [center.lat, center.lon, radiusKm]);
 
   useEffect(() => {
     return () => {

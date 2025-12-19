@@ -247,6 +247,7 @@ export default function BrowsePage() {
         <div style={{ display: 'grid', gap: '1.2rem' }}>
           <BrowseMap
             center={center}
+            radiusKm={distanceKm || undefined}
             markers={markerData}
             onMarkerClick={(m) => {
               const found = filteredProviders.find((p) => p.id === m.id) || null;
