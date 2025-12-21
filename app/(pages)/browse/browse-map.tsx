@@ -43,7 +43,7 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm, sh
   const markerLayerRef = useRef<any>(null);
   const radiusRef = useRef<any>(null);
   const centerMarkerRef = useRef<any>(null);
-  const firstMarkerRef = useRef<any>(null);
+  const providerCirclesRef = useRef<any[]>([]);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const clickRef = useRef(onMarkerClick);
 
@@ -102,10 +102,9 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm, sh
       centerMarkerRef.current.remove();
       centerMarkerRef.current = null;
     }
-    if (firstMarkerRef.current) {
-      firstMarkerRef.current.remove();
-      firstMarkerRef.current = null;
-    }
+    // Remove all existing provider circles
+    providerCirclesRef.current.forEach((circle) => circle.remove());
+    providerCirclesRef.current = [];
     
     // Only show a dark blue circle at user's location if user location has loaded
     if (showUserMarker) {
@@ -118,17 +117,17 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm, sh
       }).addTo(mapRef.current);
     }
     
-    // Show red circle at first provider's location
-    if (markers.length > 0) {
-      const firstMarker = markers[0];
-      firstMarkerRef.current = L.circleMarker([firstMarker.lat, firstMarker.lon], {
+    // Show red circle for each provider's location
+    markers.forEach((marker) => {
+      const circle = L.circleMarker([marker.lat, marker.lon], {
         radius: 8,
         color: '#dc2626',
         weight: 2,
         fillColor: '#dc2626',
         fillOpacity: 0.8,
       }).addTo(mapRef.current);
-    }
+      providerCirclesRef.current.push(circle);
+    });
     
     // Show radius circle if distance filter is active
     if (radiusKm !== undefined && radiusKm > 0) {
