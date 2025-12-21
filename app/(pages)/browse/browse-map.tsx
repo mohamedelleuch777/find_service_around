@@ -22,7 +22,7 @@ type Props = {
   showUserMarker?: boolean;
 };
 
-const DEFAULT_ZOOM = 8;
+const DEFAULT_ZOOM = 11;
 let leafletSingleton: any = null;
 let markerIconSingleton: any = null;
 let userHomeIconSingleton: any = null;
