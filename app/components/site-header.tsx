@@ -61,7 +61,7 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
   }, [prefilledName, prefilledPhoto]);
 
   return (
-    <header className="site-header">
+    <header className={`site-header${navOpen ? ' is-open' : ''}`}>
       <div className="site-header__inner">
         <Link href="/" className="site-header__brand">
           ServiceHub

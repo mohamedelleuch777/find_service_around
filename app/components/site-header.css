@@ -178,8 +178,8 @@
 }
 
 @media (max-width: 900px) {
-  .site-header {
-    /* height: 100vh; */
+  .site-header.is-open {
+    height: 100vh;
   }
   .site-header__inner {
     flex-wrap: wrap;
