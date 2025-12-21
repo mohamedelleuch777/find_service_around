@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FormFieldSkeleton } from '../../components/skeleton';
+import '../auth.css';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -12,7 +13,6 @@ export default function LoginPage() {
   const [checking, setChecking] = useState(true);
   const router = useRouter();
 
-  // If we already have a token stored and it is valid, redirect home.
   useEffect(() => {
     const idToken = typeof window !== 'undefined' ? localStorage.getItem('idToken') : null;
     if (!idToken) {
@@ -68,78 +68,43 @@ export default function LoginPage() {
   if (checking) return null;
 
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-        display: 'grid',
-        placeItems: 'center',
-        padding: '2rem 1.5rem',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 480,
-          background: 'white',
-          borderRadius: '1rem',
-          border: '1px solid var(--border)',
-          boxShadow: 'var(--shadow-xl)',
-          padding: '2.5rem',
-        }}
-      >
-        <h1 style={{ margin: '0 0 0.5rem', fontSize: '2rem', fontWeight: 800, background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Welcome back</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.75rem', fontSize: '0.95rem' }}>
-          Access your account to manage bookings and service listings.
-        </p>
+    <main className="auth-page">
+      <div className="auth-card">
+        <h1 className="auth-title">Welcome back</h1>
+        <p className="auth-subtitle">Access your account to manage bookings and service listings.</p>
 
-        <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+        <form onSubmit={onSubmit} className="auth-form">
           {checking || loading ? (
             <>
               <FormFieldSkeleton />
               <FormFieldSkeleton />
-              <div style={{ height: '2.85rem', background: 'linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 2s infinite', borderRadius: '0.75rem' }} />
+              <div style={{ height: '2.85rem' }} className="skeleton skeleton--line" />
             </>
           ) : (
             <>
-              <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label className="auth-label">
                 <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Email address</span>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  style={{ padding: '0.85rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border)', fontFamily: 'inherit' }}
+                  className="auth-input"
                 />
               </label>
 
-              <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label className="auth-label">
                 <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Password</span>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  style={{ padding: '0.85rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border)', fontFamily: 'inherit' }}
+                  className="auth-input"
                 />
               </label>
 
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  padding: '1rem',
-                  borderRadius: '0.75rem',
-                  border: 'none',
-                  background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
-                  color: 'white',
-                  fontWeight: 700,
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  boxShadow: 'var(--shadow-md)',
-                  opacity: loading ? 0.7 : 1,
-                  transition: 'all 0.2s',
-                }}
-              >
+              <button type="submit" disabled={loading} className="auth-button">
                 {loading ? 'Signing in...' : 'Sign in'}
               </button>
             </>
@@ -147,18 +112,20 @@ export default function LoginPage() {
         </form>
 
         {status && (
-          <div style={{ marginTop: '1.5rem', padding: '1rem', borderRadius: '0.75rem', background: status.includes('error') || status.includes('failed') ? '#fee2e2' : '#ecfdf5', color: status.includes('error') || status.includes('failed') ? 'var(--danger)' : 'var(--success)', fontSize: '0.9rem' }}>
+          <div
+            className="auth-status"
+            style={{
+              background: status.includes('error') || status.includes('failed') ? '#fee2e2' : '#ecfdf5',
+              color: status.includes('error') || status.includes('failed') ? 'var(--danger)' : 'var(--success)',
+            }}
+          >
             {status}
           </div>
         )}
 
-        <div style={{ marginTop: '1.75rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center' }}>
-          <a href="/register" style={{ color: 'var(--primary)', fontWeight: 600 }}>
-            Create a new account
-          </a>
-          <a href="/forgot-password" style={{ color: 'var(--primary)', fontWeight: 600 }}>
-            Forgot your password?
-          </a>
+        <div className="auth-links">
+          <a href="/register">Create a new account</a>
+          <a href="/forgot-password">Forgot your password?</a>
         </div>
       </div>
     </main>

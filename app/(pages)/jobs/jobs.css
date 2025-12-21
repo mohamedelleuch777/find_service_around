@@ -1,0 +1,75 @@
+.jobs-page {
+  background: radial-gradient(circle at 20% 20%, rgba(14,165,233,0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(16,185,129,0.12), transparent 30%), #f7f9fb;
+  min-height: 100vh;
+}
+
+.jobs-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem var(--page-padding) 3rem;
+  display: grid;
+  gap: 1.2rem;
+}
+
+.jobs-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  padding: 1.25rem 1.5rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.jobs-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.jobs-table-wrap {
+  overflow-x: auto;
+}
+
+.jobs-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 820px;
+}
+
+.jobs-th {
+  text-align: left;
+  padding: 0.75rem 0.65rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.jobs-td {
+  padding: 0.9rem 0.65rem;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+
+.jobs-user-link {
+  color: #0f172a;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.jobs-user-link:hover {
+  color: #0369a1;
+}
+
+@media (max-width: 768px) {
+  .jobs-main {
+    padding-top: 1.75rem;
+  }
+
+  .jobs-card {
+    padding: 1rem;
+  }
+}

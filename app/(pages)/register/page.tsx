@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import '../auth.css';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -11,7 +12,6 @@ export default function RegisterPage() {
   const [checking, setChecking] = useState(true);
   const router = useRouter();
 
-  // Redirect away if already authenticated.
   useEffect(() => {
     const idToken = typeof window !== 'undefined' ? localStorage.getItem('idToken') : null;
     if (!idToken) {
@@ -68,44 +68,24 @@ export default function RegisterPage() {
   if (checking) return null;
 
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-        display: 'grid',
-        placeItems: 'center',
-        padding: '2rem 1.5rem',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 480,
-          background: 'white',
-          borderRadius: '1rem',
-          border: '1px solid var(--border)',
-          boxShadow: 'var(--shadow-xl)',
-          padding: '2.5rem',
-        }}
-      >
-        <h1 style={{ margin: '0 0 0.5rem', fontSize: '2rem', fontWeight: 800, background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Create an account</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.75rem', fontSize: '0.95rem' }}>
-          Join thousands of users booking and providing services.
-        </p>
+    <main className="auth-page">
+      <div className="auth-card">
+        <h1 className="auth-title">Create an account</h1>
+        <p className="auth-subtitle">Join thousands of users booking and providing services.</p>
 
-        <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <form onSubmit={onSubmit} className="auth-form">
+          <label className="auth-label">
             <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Email address</span>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              style={{ padding: '0.85rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border)', fontFamily: 'inherit' }}
+              className="auth-input"
             />
           </label>
 
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label className="auth-label">
             <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Password</span>
             <input
               type="password"
@@ -113,42 +93,33 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              style={{ padding: '0.85rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border)', fontFamily: 'inherit' }}
+              className="auth-input"
             />
             <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>Minimum 6 characters</span>
           </label>
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              padding: '1rem',
-              borderRadius: '0.75rem',
-              border: 'none',
-              background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
-              color: 'white',
-              fontWeight: 700,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: 'var(--shadow-md)',
-              opacity: loading ? 0.7 : 1,
-              transition: 'all 0.2s',
-            }}
-          >
+          <button type="submit" disabled={loading} className="auth-button">
             {loading ? 'Creating account...' : 'Sign up'}
           </button>
         </form>
 
         {status && (
-          <div style={{ marginTop: '1.5rem', padding: '1rem', borderRadius: '0.75rem', background: status.includes('error') || status.includes('failed') ? '#fee2e2' : '#ecfdf5', color: status.includes('error') || status.includes('failed') ? 'var(--danger)' : 'var(--success)', fontSize: '0.9rem' }}>
+          <div
+            className="auth-status"
+            style={{
+              background: status.includes('error') || status.includes('failed') ? '#fee2e2' : '#ecfdf5',
+              color: status.includes('error') || status.includes('failed') ? 'var(--danger)' : 'var(--success)',
+            }}
+          >
             {status}
           </div>
         )}
 
-        <div style={{ marginTop: '1.75rem', color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center' }}>
-          Already have an account?{' '}
-          <a href="/login" style={{ color: 'var(--primary)', fontWeight: 600 }}>
-            Sign in
-          </a>
+        <div className="auth-links">
+          <div>
+            Already have an account?{' '}
+            <a href="/login">Sign in</a>
+          </div>
         </div>
       </div>
     </main>

@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   description: 'Discover and connect with local service providers.',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: {

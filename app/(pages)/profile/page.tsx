@@ -4,7 +4,8 @@ import { ChangeEvent, FormEvent, useEffect, useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import SiteHeader from '../../components/site-header';
-import { SkeletonLine, SkeletonBox, SkeletonCircle, FormFieldSkeleton } from '../../components/skeleton';
+import { SkeletonLine, SkeletonBox, FormFieldSkeleton } from '../../components/skeleton';
+import './profile.css';
 
 const DEFAULT_USER_ID = 'demo-user';
 const ProfileMap = dynamic(() => import('./profile-map'), { ssr: false });
@@ -349,28 +350,9 @@ function ProfilePageInner() {
     <>
       <SiteHeader prefilledName={headerName} prefilledPhoto={headerPhoto} />
 
-      <main
-        style={{
-          minHeight: '100vh',
-          background: 'radial-gradient(circle at 20% 20%, rgba(14,165,233,0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(16,185,129,0.12), transparent 30%), #f7f9fb',
-          display: 'grid',
-          placeItems: 'center',
-          padding: '2rem 1.5rem',
-        }}
-      >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 900,
-          background: 'rgba(255,255,255,0.65)',
-          backdropFilter: 'blur(8px)',
-          borderRadius: 18,
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 24px 50px rgba(15,23,42,0.1)',
-          padding: '1.75rem',
-        }}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem', gap: '0.75rem' }}>
+      <main className="profile-page">
+      <div className="profile-card">
+        <div className="profile-header">
           <div style={{ position: 'relative' }}>
             {initializing ? (
               <div style={{ width: 120, height: 120, borderRadius: '50%', background: '#e2e8f0', animation: 'shimmer 2s infinite' }} />
@@ -380,55 +362,19 @@ function ProfilePageInner() {
                   <img
                     src={photoDataUrl}
                     alt="Profile"
-                    style={{
-                      width: 120,
-                      height: 120,
-                      borderRadius: '50%',
-                      objectFit: 'cover',
-                      border: '4px solid #e2e8f0',
-                      boxShadow: '0 8px 24px rgba(15,23,42,0.12)',
-                    }}
+                    className="profile-avatar"
                   />
                 ) : (
                   <div
                     aria-hidden="true"
-                    style={{
-                      width: 120,
-                      height: 120,
-                      borderRadius: '50%',
-                      border: '4px solid #e2e8f0',
-                      boxShadow: '0 8px 24px rgba(15,23,42,0.12)',
-                      background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
-                      display: 'grid',
-                      placeItems: 'center',
-                      color: 'white',
-                      fontSize: '2rem',
-                    }}
+                    className="profile-avatar-placeholder"
                   >
                     <i className="fa-solid fa-user" />
                   </div>
                 )}
                 {isOwnProfile && !initializing && (
                   <label
-                    style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      right: 0,
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      background: '#0f172a',
-                      color: 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      border: '3px solid white',
-                      boxShadow: '0 4px 12px rgba(15,23,42,0.16)',
-                      transition: 'all 0.2s',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = '#1e293b')}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = '#0f172a')}
+                    className="profile-avatar-upload"
                   >
                     <i className="fa-solid fa-camera" aria-hidden="true" />
                     <input
@@ -449,8 +395,8 @@ function ProfilePageInner() {
 
         <h2 style={{ margin: '0 0 0.5rem', fontSize: '1.5rem', display: 'none' }}>Profile</h2>
         
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-          <div style={{ padding: '0.65rem 0.9rem', border: '1px solid #e2e8f0', borderRadius: 12, background: '#fff', boxShadow: '0 10px 30px rgba(15,23,42,0.08)' }}>
+        <div className="profile-stats">
+          <div className="profile-stat-card">
             <div style={{ fontWeight: 700, color: '#0f172a' }}>
               {initializing ? <SkeletonLine width="80px" height="1.5rem" /> : (ratingAvg !== null ? `${ratingAvg.toFixed(1)} / 5` : 'Unrated')}
             </div>
@@ -458,7 +404,7 @@ function ProfilePageInner() {
               {initializing ? <SkeletonLine width="150px" height="1rem" /> : (`${ratingCount} rating${ratingCount === 1 ? '' : 's'} • ${reviewCount} review${reviewCount === 1 ? '' : 's'}`)}
             </div>
           </div>
-          <div style={{ padding: '0.65rem 0.9rem', border: '1px solid #e2e8f0', borderRadius: 12, background: '#fff', boxShadow: '0 10px 30px rgba(15,23,42,0.08)' }}>
+          <div className="profile-stat-card">
             <div style={{ fontWeight: 700, color: '#0f172a' }}>
               {initializing ? <SkeletonLine width="80px" height="1.5rem" /> : (score !== null ? `${score}% Confidence` : 'No score')}
             </div>
@@ -468,21 +414,11 @@ function ProfilePageInner() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid #e2e8f0', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <div className="profile-tabs">
           <button
             type="button"
             onClick={() => setActiveTab('basic')}
-            style={{
-              padding: '0.75rem 1.25rem',
-              border: 'none',
-              background: 'transparent',
-              borderBottom: activeTab === 'basic' ? '2px solid #0f172a' : 'none',
-              color: activeTab === 'basic' ? '#0f172a' : '#64748b',
-              fontWeight: activeTab === 'basic' ? 600 : 400,
-              cursor: 'pointer',
-              fontSize: '1rem',
-              transition: 'all 0.2s',
-            }}
+            className={`profile-tab${activeTab === 'basic' ? ' is-active' : ''}`}
           >
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
               <i className="fa-solid fa-user" aria-hidden="true" />
@@ -492,17 +428,7 @@ function ProfilePageInner() {
           <button
             type="button"
             onClick={() => setActiveTab('location')}
-            style={{
-              padding: '0.75rem 1.25rem',
-              border: 'none',
-              background: 'transparent',
-              borderBottom: activeTab === 'location' ? '2px solid #0f172a' : 'none',
-              color: activeTab === 'location' ? '#0f172a' : '#64748b',
-              fontWeight: activeTab === 'location' ? 600 : 400,
-              cursor: 'pointer',
-              fontSize: '1rem',
-              transition: 'all 0.2s',
-            }}
+            className={`profile-tab${activeTab === 'location' ? ' is-active' : ''}`}
           >
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
               <i className="fa-solid fa-location-dot" aria-hidden="true" />
@@ -513,17 +439,7 @@ function ProfilePageInner() {
             <button
               type="button"
               onClick={() => setActiveTab('provider')}
-              style={{
-                padding: '0.75rem 1.25rem',
-                border: 'none',
-                background: 'transparent',
-                borderBottom: activeTab === 'provider' ? '2px solid #0f172a' : 'none',
-                color: activeTab === 'provider' ? '#0f172a' : '#64748b',
-                fontWeight: activeTab === 'provider' ? 600 : 400,
-                cursor: 'pointer',
-                fontSize: '1rem',
-                transition: 'all 0.2s',
-              }}
+              className={`profile-tab${activeTab === 'provider' ? ' is-active' : ''}`}
             >
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                 <i className="fa-solid fa-briefcase" aria-hidden="true" />
@@ -534,17 +450,7 @@ function ProfilePageInner() {
           <button
             type="button"
             onClick={() => setActiveTab('gallery')}
-            style={{
-              padding: '0.75rem 1.25rem',
-              border: 'none',
-              background: 'transparent',
-              borderBottom: activeTab === 'gallery' ? '2px solid #0f172a' : 'none',
-              color: activeTab === 'gallery' ? '#0f172a' : '#64748b',
-              fontWeight: activeTab === 'gallery' ? 600 : 400,
-              cursor: 'pointer',
-              fontSize: '1rem',
-              transition: 'all 0.2s',
-            }}
+            className={`profile-tab${activeTab === 'gallery' ? ' is-active' : ''}`}
           >
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
               <i className="fa-solid fa-images" aria-hidden="true" />
@@ -555,7 +461,8 @@ function ProfilePageInner() {
 
         <form
           onSubmit={onSubmit}
-          style={{ display: activeTab !== 'basic' ? 'none' : 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}
+          className="profile-form-grid"
+          style={{ display: activeTab !== 'basic' ? 'none' : 'grid' }}
         >
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
             <span>Email</span>
@@ -672,7 +579,8 @@ function ProfilePageInner() {
 
         <form
           onSubmit={onSubmit}
-          style={{ display: activeTab !== 'location' ? 'none' : 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}
+          className="profile-form-grid"
+          style={{ display: activeTab !== 'location' ? 'none' : 'grid' }}
         >
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
             <span>Address</span>
@@ -850,7 +758,8 @@ function ProfilePageInner() {
 
         <form
           onSubmit={onSubmit}
-          style={{ display: activeTab !== 'provider' ? 'none' : 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}
+          className="profile-form-grid"
+          style={{ display: activeTab !== 'provider' ? 'none' : 'grid' }}
         >
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
             <span>Work status</span>
@@ -1017,7 +926,8 @@ function ProfilePageInner() {
 
         <form
           onSubmit={onSubmit}
-          style={{ display: activeTab !== 'gallery' ? 'none' : 'grid', gap: '1rem', gridTemplateColumns: '1fr' }}
+          className="profile-form-grid profile-form-grid--single"
+          style={{ display: activeTab !== 'gallery' ? 'none' : 'grid' }}
         >
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>

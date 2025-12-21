@@ -1,0 +1,60 @@
+.skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.skeleton--line {
+  border-radius: 0.375rem;
+}
+
+.skeleton--circle {
+  border-radius: 50%;
+}
+
+.skeleton-card {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.skeleton-profile-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.skeleton-job-card {
+  padding: 1.25rem;
+  background: white;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1rem;
+}
+
+.skeleton-job-card__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.skeleton-form-field {
+  margin-bottom: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .skeleton-profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .skeleton-job-card__row {
+    flex-direction: column;
+  }
+}

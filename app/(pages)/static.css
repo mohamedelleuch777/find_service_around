@@ -1,0 +1,86 @@
+.static-page {
+  padding: 3rem var(--page-padding);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.static-hero {
+  margin-bottom: 3rem;
+}
+
+.static-title {
+  margin: 0 0 1rem;
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.static-text {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.static-card-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.static-card {
+  padding: 2rem;
+  background: white;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.static-card-title {
+  margin: 0 0 0.75rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contact-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.contact-item {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .static-page {
+    padding: 2rem var(--page-padding);
+  }
+
+  .static-title {
+    font-size: 2rem;
+  }
+
+  .contact-card {
+    padding: 1.75rem;
+  }
+}

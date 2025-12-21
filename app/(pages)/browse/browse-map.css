@@ -12,3 +12,10 @@
   border: none !important;
   box-shadow: none !important;
 }
+
+@media (max-width: 768px) {
+  .browse-map {
+    height: 360px;
+    border-radius: 14px;
+  }
+}

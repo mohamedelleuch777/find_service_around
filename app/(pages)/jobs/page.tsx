@@ -3,6 +3,7 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import SiteHeader from '../../components/site-header';
 import { JobCardSkeleton } from '../../components/skeleton';
+import './jobs.css';
 
 type Job = {
   id: string;
@@ -246,9 +247,7 @@ export default function JobsPage() {
     return (
       <a
         href={`/profile?userId=${encodeURIComponent(userId)}`}
-        style={{ color: '#0f172a', textDecoration: 'none', fontWeight: 600, cursor: 'pointer' }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = '#0369a1')}
-        onMouseLeave={(e) => (e.currentTarget.style.color = '#0f172a')}
+        className="jobs-user-link"
       >
         {name}
       </a>
@@ -270,46 +269,36 @@ export default function JobsPage() {
   };
 
   const renderTable = (title: string, items: (Job & { section?: string })[]) => (
-    <div
-      style={{
-        background: 'rgba(255,255,255,0.9)',
-        borderRadius: 16,
-        border: '1px solid #e2e8f0',
-        boxShadow: '0 16px 40px rgba(15,23,42,0.08)',
-        padding: '1.25rem 1.5rem',
-        display: 'grid',
-        gap: '0.9rem',
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+    <div className="jobs-card">
+      <div className="jobs-card-head">
         <h2 style={{ margin: 0 }}>{title}</h2>
         <span style={{ color: '#475569' }}>{items.length} total</span>
       </div>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 820 }}>
+      <div className="jobs-table-wrap">
+        <table className="jobs-table">
           <thead>
-            <tr style={{ background: '#f8fafc' }}>
-              <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Section</th>
-              <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Job</th>
-              {showClientColumn && <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Client</th>}
-              {showProviderColumn && <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Provider</th>}
-              <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Status</th>
-              <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Actions</th>
+            <tr>
+              <th className="jobs-th">Section</th>
+              <th className="jobs-th">Job</th>
+              {showClientColumn && <th className="jobs-th">Client</th>}
+              {showProviderColumn && <th className="jobs-th">Provider</th>}
+              <th className="jobs-th">Status</th>
+              <th className="jobs-th">Actions</th>
             </tr>
           </thead>
           <tbody>
             {items.length === 0 && (
               <tr>
-                <td colSpan={colCount} style={{ padding: '0.9rem 0.65rem', color: '#475569' }}>
+                <td colSpan={colCount} className="jobs-td" style={{ color: '#475569' }}>
                   No jobs here.
                 </td>
               </tr>
             )}
             {items.map((job) => (
               <Fragment key={job.id}>
-                <tr style={{ borderBottom: '1px solid #e2e8f0', verticalAlign: 'top' }}>
-                  <td style={{ padding: '0.9rem 0.65rem', color: '#475569', fontWeight: 600 }}>{job.section || '-'}</td>
-                  <td style={{ padding: '0.9rem 0.65rem' }}>
+                <tr>
+                  <td className="jobs-td" style={{ color: '#475569', fontWeight: 600 }}>{job.section || '-'}</td>
+                  <td className="jobs-td">
                     <div style={{ fontWeight: 700 }}>{job.title || job.jobId || 'Job'}</div>
                     {job.endRequest && (
                       <div style={{ color: '#475569', fontSize: '0.9rem', marginTop: 4 }}>
@@ -333,9 +322,9 @@ export default function JobsPage() {
                     {job.acceptance && <div style={{ color: '#0f172a', marginTop: 4 }}>Accepted by provider</div>}
                     {job.decline && <div style={{ color: '#b91c1c', marginTop: 4 }}>Declined by provider</div>}
                   </td>
-                  {showClientColumn && <td style={{ padding: '0.9rem 0.65rem', color: '#475569' }}><UserNameLink userId={job.clientId} /></td>}
-                  {showProviderColumn && <td style={{ padding: '0.9rem 0.65rem', color: '#475569' }}><UserNameLink userId={job.providerId} /></td>}
-                  <td style={{ padding: '0.9rem 0.65rem', color: '#0f172a' }}>
+                  {showClientColumn && <td className="jobs-td" style={{ color: '#475569' }}><UserNameLink userId={job.clientId} /></td>}
+                  {showProviderColumn && <td className="jobs-td" style={{ color: '#475569' }}><UserNameLink userId={job.providerId} /></td>}
+                  <td className="jobs-td" style={{ color: '#0f172a' }}>
                     {(() => {
                       const { bg, color } = statusStyle(job.status);
                       return (
@@ -356,7 +345,7 @@ export default function JobsPage() {
                       );
                     })()}
                   </td>
-                  <td style={{ padding: '0.9rem 0.65rem', minWidth: 240 }}>
+                  <td className="jobs-td" style={{ minWidth: 240 }}>
                     {job.status === 'pending_provider_accept' && job.providerId === currentUserId && (
                       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                         <button
@@ -586,12 +575,12 @@ export default function JobsPage() {
   );
 
   return (
-    <div style={{ background: 'radial-gradient(circle at 20% 20%, rgba(14,165,233,0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(16,185,129,0.12), transparent 30%), #f7f9fb', minHeight: '100vh' }}>
+    <div className="jobs-page">
       <SiteHeader />
-      <main style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1.5rem 3rem', display: 'grid', gap: '1.2rem' }}>
+      <main className="jobs-main">
         <h1 style={{ margin: 0 }}>My jobs</h1>
         {loading ? (
-          <div style={{ display: 'grid', gap: '1rem' }}>
+          <div className="stack-sm">
             {[1, 2, 3, 4, 5].map((i) => (
               <JobCardSkeleton key={i} />
             ))}

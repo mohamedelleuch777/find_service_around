@@ -5,3 +5,9 @@
   overflow: hidden;
   border: 1px solid #cbd5e1;
 }
+
+@media (max-width: 768px) {
+  .profile-map {
+    height: 260px;
+  }
+}
