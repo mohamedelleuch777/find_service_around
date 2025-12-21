@@ -254,9 +254,10 @@ export default function Home() {
                     boxShadow: 'var(--shadow-md)',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '1rem',
+                    gap: '0.5rem',
                     transition: 'all 0.2s',
                     cursor: 'pointer',
+                    minHeight: 96,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-4px)';
@@ -266,11 +267,24 @@ export default function Home() {
                     e.currentTarget.style.transform = 'translateY(0)';
                     e.currentTarget.style.boxShadow = 'var(--shadow-md)';
                   }}
+                  title={label}
                 >
-                  <div style={{ width: 56, height: 56, borderRadius: '0.75rem', background: 'transparent', border: '1px solid var(--border)', display: 'grid', placeItems: 'center', color: 'var(--primary)', fontSize: '1.4rem' }}>
+                  <div style={{ width: 56, height: 56, borderRadius: '0.75rem', background: 'transparent', display: 'grid', placeItems: 'center', color: 'var(--primary)', fontSize: '1.4rem' }}>
                     <i className={`fa-solid ${iconClass}`} aria-hidden="true" />
                   </div>
-                  <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{label}</div>
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      color: 'var(--primary)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      maxWidth: '100%',
+                      flex: 1,
+                    }}
+                  >
+                    {label}
+                  </div>
                 </div>
                 );
               })
