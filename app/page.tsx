@@ -177,8 +177,8 @@ export default function Home() {
                     {content?.hero.body}
                   </p>
                   <div style={{ marginBottom: '1rem' }}>
-                    <button
-                      type="button"
+                    <Link
+                      href="/browse"
                       style={{
                         width: '100%',
                         padding: '1rem 1.5rem',
@@ -190,12 +190,16 @@ export default function Home() {
                         boxShadow: 'var(--shadow-md)',
                         cursor: 'pointer',
                         transition: 'transform 0.2s',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        textDecoration: 'none',
                       }}
                       onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
                       onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
                     >
                       {content?.search.buttonText ?? 'Find services'}
-                    </button>
+                    </Link>
                   </div>
                   <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
                     {content?.highlights?.map((item, idx) => (
