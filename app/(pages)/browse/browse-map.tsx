@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import 'leaflet/dist/leaflet.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import './browse-map.css';
 
 type Marker = {
@@ -24,6 +25,7 @@ type Props = {
 const DEFAULT_ZOOM = 8;
 let leafletSingleton: any = null;
 let markerIconSingleton: any = null;
+let userHomeIconSingleton: any = null;
 
 function getLeaflet() {
   if (leafletSingleton) return leafletSingleton;
@@ -33,6 +35,13 @@ function getLeaflet() {
     className: 'browse-map-pin',
     iconSize: [22, 22],
     iconAnchor: [11, 11],
+  });
+  userHomeIconSingleton = L.divIcon({
+    html: `<i class="fas fa-home" style="color: white; font-size: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); display: block; width: 30px; height: 30px; line-height: 30px; text-align: center;"></i>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [0, -15],
+    className: '',
   });
   leafletSingleton = L;
   return L;
@@ -106,14 +115,10 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm, sh
     providerCirclesRef.current.forEach((circle) => circle.remove());
     providerCirclesRef.current = [];
     
-    // Only show a dark blue circle at user's location if user location has loaded
+    // Only show a house icon at user's location if user location has loaded
     if (showUserMarker) {
-      centerMarkerRef.current = L.circleMarker([center.lat, center.lon], {
-        radius: 8,
-        color: '#1e40af',
-        weight: 2,
-        fillColor: '#1e40af',
-        fillOpacity: 0.8,
+      centerMarkerRef.current = L.marker([center.lat, center.lon], { 
+        icon: userHomeIconSingleton 
       }).addTo(mapRef.current);
     }
     
