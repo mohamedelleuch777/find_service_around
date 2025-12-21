@@ -231,11 +231,24 @@ export default function BrowsePage() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition((pos) => {
-                      setCenter({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-                    });
+                onClick={async () => {
+                  if (!currentUserId) return;
+                  try {
+                    const res = await fetch(`/api/profile?userId=${encodeURIComponent(currentUserId)}`);
+                    const data = await res.json();
+                    if (data.profile?.latitude && data.profile?.longitude) {
+                      setCenter({ lat: data.profile.latitude, lon: data.profile.longitude });
+                    } else if (navigator.geolocation) {
+                      navigator.geolocation.getCurrentPosition((pos) => {
+                        setCenter({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+                      });
+                    }
+                  } catch {
+                    if (navigator.geolocation) {
+                      navigator.geolocation.getCurrentPosition((pos) => {
+                        setCenter({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+                      });
+                    }
                   }
                 }}
                 style={{ padding: '0.65rem 0.9rem', borderRadius: '0.5rem', border: '1px solid var(--primary)', background: 'var(--primary)', color: 'white', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.2s' }}
