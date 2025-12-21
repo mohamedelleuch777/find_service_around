@@ -108,6 +108,22 @@ export default function BrowsePage() {
     fetchJobs();
   }, [currentUserId]);
 
+  useEffect(() => {
+    if (!currentUserId) return;
+    const fetchUserLocation = async () => {
+      try {
+        const res = await fetch(`/api/profile?userId=${encodeURIComponent(currentUserId)}`);
+        const data = await res.json();
+        if (data.profile?.latitude && data.profile?.longitude) {
+          setCenter({ lat: data.profile.latitude, lon: data.profile.longitude });
+        }
+      } catch {
+        // ignore
+      }
+    };
+    fetchUserLocation();
+  }, [currentUserId]);
+
   const filteredProviders = useMemo(() => {
     return providers.filter((p) => {
       if (selectedCategories.length && !selectedCategories.includes(p.categoryId)) return false;

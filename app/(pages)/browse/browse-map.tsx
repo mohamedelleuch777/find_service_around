@@ -100,6 +100,17 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm }: 
       centerMarkerRef.current.remove();
       centerMarkerRef.current = null;
     }
+    
+    // Always show a dark blue circle at user's location
+    centerMarkerRef.current = L.circleMarker([center.lat, center.lon], {
+      radius: 8,
+      color: '#1e40af',
+      weight: 2,
+      fillColor: '#1e40af',
+      fillOpacity: 0.8,
+    }).addTo(mapRef.current);
+    
+    // Show radius circle if distance filter is active
     if (radiusKm && radiusKm > 0) {
       radiusRef.current = L.circle([center.lat, center.lon], {
         radius: radiusKm * 1000,
@@ -108,13 +119,6 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm }: 
         opacity: 0.4,
         fillColor: '#0f172a',
         fillOpacity: 0.12,
-      }).addTo(mapRef.current);
-      centerMarkerRef.current = L.circleMarker([center.lat, center.lon], {
-        radius: 6,
-        color: '#0f172a',
-        weight: 2,
-        fillColor: '#0f172a',
-        fillOpacity: 1,
       }).addTo(mapRef.current);
     }
   }, [center.lat, center.lon, radiusKm]);
