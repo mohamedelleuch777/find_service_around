@@ -58,9 +58,11 @@ export default function BrowsePage() {
   const [center, setCenter] = useState(DEFAULT_CENTER);
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [userLocationLoaded, setUserLocationLoaded] = useState(false);
+  const [hasUserLocation, setHasUserLocation] = useState(false);
   const [userName, setUserName] = useState<string>('');
 
   useEffect(() => {
@@ -88,7 +90,9 @@ export default function BrowsePage() {
   }, []);
 
   useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('idToken') : null;
     const uid = typeof window !== 'undefined' ? localStorage.getItem('profileUserId') || 'demo-user' : 'demo-user';
+    setIsLoggedIn(!!token);
     setCurrentUserId(uid);
   }, []);
 
@@ -114,6 +118,9 @@ export default function BrowsePage() {
         const data = await res.json();
         if (data.profile?.latitude && data.profile?.longitude) {
           setCenter({ lat: data.profile.latitude, lon: data.profile.longitude });
+          setHasUserLocation(true);
+        } else {
+          setHasUserLocation(false);
         }
         if (data.profile?.firstName || data.profile?.lastName) {
           const fullName = `${data.profile.firstName || ''} ${data.profile.lastName || ''}`.trim();
@@ -287,7 +294,7 @@ export default function BrowsePage() {
             center={center}
             radiusKm={distanceKm || undefined}
             markers={markerData}
-            showUserMarker={userLocationLoaded}
+            showUserMarker={userLocationLoaded && hasUserLocation && isLoggedIn}
             userName={userName}
             currentUserId={currentUserId}
             onMarkerClick={(m) => {
