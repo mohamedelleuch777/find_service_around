@@ -72,6 +72,7 @@ function ProfilePageInner() {
   const targetUserId = searchParams?.get('userId') || resolvedUserId;
   const headerName = targetUserId ? undefined : profileName;
   const headerPhoto = targetUserId ? undefined : profilePic;
+  const isOwnProfile = !targetUserId || targetUserId === resolvedUserId;
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('idToken') : null;
@@ -369,10 +370,64 @@ function ProfilePageInner() {
           padding: '1.75rem',
         }}
       >
-        <h1 style={{ margin: '0 0 0.5rem', fontSize: '2rem' }}>Profile</h1>
-        <p style={{ color: '#475569', marginBottom: '1.5rem' }}>
-          Set your account type and complete your personal details. Upload a profile picture to personalize your account.
-        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem', gap: '0.75rem' }}>
+          <div style={{ position: 'relative' }}>
+            {initializing ? (
+              <div style={{ width: 120, height: 120, borderRadius: '50%', background: '#e2e8f0', animation: 'shimmer 2s infinite' }} />
+            ) : (
+              <>
+                <img
+                  src={photoDataUrl || '/avatar-placeholder.svg'}
+                  alt="Profile"
+                  style={{
+                    width: 120,
+                    height: 120,
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    border: '4px solid #e2e8f0',
+                    boxShadow: '0 8px 24px rgba(15,23,42,0.12)',
+                  }}
+                />
+                {isOwnProfile && !initializing && (
+                  <label
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      right: 0,
+                      width: 40,
+                      height: 40,
+                      borderRadius: '50%',
+                      background: '#0f172a',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      border: '3px solid white',
+                      boxShadow: '0 4px 12px rgba(15,23,42,0.16)',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = '#1e293b')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = '#0f172a')}
+                  >
+                    <span style={{ fontSize: '1.2rem' }}>📷</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={onImageChange}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                )}
+              </>
+            )}
+          </div>
+          <h1 style={{ margin: 0, fontSize: '1.75rem', textAlign: 'center' }}>
+            {initializing ? '...' : `${firstName || ''} ${lastName || ''}`.trim() || 'User Profile'}
+          </h1>
+        </div>
+
+        <h2 style={{ margin: '0 0 0.5rem', fontSize: '1.5rem', display: 'none' }}>Profile</h2>
         
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
           <div style={{ padding: '0.65rem 0.9rem', border: '1px solid #e2e8f0', borderRadius: 12, background: '#fff', boxShadow: '0 10px 30px rgba(15,23,42,0.08)' }}>
@@ -558,22 +613,6 @@ function ProfilePageInner() {
                 onChange={(e) => setScore(e.target.value === '' ? null : Number(e.target.value))}
                 style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
               />
-            )}
-          </label>
-
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <span>Profile picture</span>
-            {initializing ? <FormFieldSkeleton /> : (
-              <>
-                <input type="file" accept="image/*" onChange={onImageChange} />
-                {photoDataUrl && (
-                  <img
-                    src={photoDataUrl}
-                    alt="Profile preview"
-                    style={{ width: 160, height: 160, objectFit: 'cover', borderRadius: 12, border: '1px solid #cbd5e1' }}
-                  />
-                )}
-              </>
             )}
           </label>
 
