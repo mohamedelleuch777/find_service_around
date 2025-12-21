@@ -71,7 +71,7 @@ export default function RegisterPage() {
     <main
       style={{
         minHeight: '100vh',
-        background: 'radial-gradient(circle at 20% 20%, rgba(14,165,233,0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(16,185,129,0.12), transparent 30%), #f7f9fb',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
         display: 'grid',
         placeItems: 'center',
         padding: '2rem 1.5rem',
@@ -80,72 +80,74 @@ export default function RegisterPage() {
       <div
         style={{
           width: '100%',
-          maxWidth: 520,
-          background: 'rgba(255,255,255,0.65)',
-          backdropFilter: 'blur(8px)',
-          borderRadius: 18,
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 24px 50px rgba(15,23,42,0.1)',
-          padding: '1.75rem',
+          maxWidth: 480,
+          background: 'white',
+          borderRadius: '1rem',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow-xl)',
+          padding: '2.5rem',
         }}
       >
-        <h1 style={{ margin: '0 0 0.5rem', fontSize: '2rem' }}>Create an account</h1>
-        <p style={{ color: '#475569', marginBottom: '1.5rem' }}>
-          Start booking services and manage your provider profile.
+        <h1 style={{ margin: '0 0 0.5rem', fontSize: '2rem', fontWeight: 800, background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Create an account</h1>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.75rem', fontSize: '0.95rem' }}>
+          Join thousands of users booking and providing services.
         </p>
 
-        <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <span>Email</span>
+        <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Email address</span>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+              style={{ padding: '0.85rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border)', fontFamily: 'inherit' }}
             />
           </label>
 
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <span>Password</span>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Password</span>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+              style={{ padding: '0.85rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border)', fontFamily: 'inherit' }}
             />
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>Minimum 6 characters</span>
           </label>
 
           <button
             type="submit"
             disabled={loading}
             style={{
-              padding: '0.95rem',
-              borderRadius: 12,
+              padding: '1rem',
+              borderRadius: '0.75rem',
               border: 'none',
-              background: '#0f172a',
+              background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
               color: 'white',
               fontWeight: 700,
-              cursor: 'pointer',
-              boxShadow: '0 16px 40px rgba(15,23,42,0.18)',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              boxShadow: 'var(--shadow-md)',
+              opacity: loading ? 0.7 : 1,
+              transition: 'all 0.2s',
             }}
           >
-            {loading ? 'Creating account...' : 'Register'}
+            {loading ? 'Creating account...' : 'Sign up'}
           </button>
         </form>
 
         {status && (
-          <div style={{ marginTop: '1rem', padding: '0.85rem', borderRadius: 10, background: '#e2e8f0' }}>
+          <div style={{ marginTop: '1.5rem', padding: '1rem', borderRadius: '0.75rem', background: status.includes('error') || status.includes('failed') ? '#fee2e2' : '#ecfdf5', color: status.includes('error') || status.includes('failed') ? 'var(--danger)' : 'var(--success)', fontSize: '0.9rem' }}>
             {status}
           </div>
         )}
 
-        <div style={{ marginTop: '1rem', color: '#475569', fontSize: '0.95rem' }}>
+        <div style={{ marginTop: '1.75rem', color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center' }}>
           Already have an account?{' '}
-          <a href="/login" style={{ color: '#0f172a', fontWeight: 600 }}>
-            Log in
+          <a href="/login" style={{ color: 'var(--primary)', fontWeight: 600 }}>
+            Sign in
           </a>
         </div>
       </div>

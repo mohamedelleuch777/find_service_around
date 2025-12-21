@@ -45,18 +45,18 @@ export default function Home() {
   }, [content?.sliderImages?.length]);
 
   return (
-    <div style={{ background: 'radial-gradient(circle at 20% 20%, rgba(14,165,233,0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(16,185,129,0.12), transparent 30%), #f7f9fb' }}>
+    <div style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)', minHeight: '100vh' }}>
       <SiteHeader />
 
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '3rem 1.5rem 4rem' }}>
         <section
           style={{
             position: 'relative',
-            borderRadius: 24,
+            borderRadius: 20,
             overflow: 'hidden',
             marginBottom: '3rem',
-            boxShadow: '0 25px 60px rgba(15,23,42,0.16)',
-            background: '#0f172a',
+            boxShadow: 'var(--shadow-2xl)',
+            background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
             minHeight: 420,
           }}
         >
@@ -82,7 +82,7 @@ export default function Home() {
               style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'linear-gradient(120deg, rgba(0,0,0,0.55), rgba(0,0,0,0.25))',
+                background: 'linear-gradient(120deg, rgba(0,0,0,0.35), rgba(0,0,0,0.15))',
               }}
             />
           </div>
@@ -124,22 +124,22 @@ export default function Home() {
             <div
               style={{
                 marginLeft: 'auto',
-                background: 'rgba(255,255,255,0.25)',
-                backdropFilter: 'blur(5px)',
-                borderRadius: 20,
-                padding: '1.5rem',
+                background: 'rgba(255,255,255,0.95)',
+                backdropFilter: 'blur(10px)',
+                borderRadius: 16,
+                padding: '2rem',
                 maxWidth: 520,
                 width: '100%',
-                boxShadow: '0 18px 44px rgba(15,23,42,0.20)',
+                boxShadow: 'var(--shadow-2xl)',
               }}
             >
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.35rem 0.65rem', borderRadius: 9999, background: 'rgba(15,23,42,0.06)', fontSize: '0.9rem', fontWeight: 600 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.35rem 0.65rem', borderRadius: 9999, background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)', fontSize: '0.9rem', fontWeight: 600, color: 'white' }}>
                 {content?.hero.subtitle ?? 'Trusted on-demand home services'}
               </div>
-              <h1 style={{ margin: '1rem 0 0.75rem', fontSize: '2.7rem', lineHeight: 1.05, letterSpacing: -0.5 }}>
+              <h1 style={{ margin: '1rem 0 0.75rem', fontSize: '2.7rem', lineHeight: 1.05, letterSpacing: -0.5, color: 'var(--primary)' }}>
                 {content?.hero.title}
               </h1>
-              <p style={{ color: '#475569', marginBottom: '1.25rem', fontSize: '1.02rem' }}>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', fontSize: '1.02rem' }}>
                 {content?.hero.body}
               </p>
               <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
@@ -147,26 +147,30 @@ export default function Home() {
                   placeholder={content?.search.placeholder ?? 'What do you need help with?'}
                   style={{
                     flex: '1 1 240px',
-                    padding: '0.9rem 1rem',
-                    borderRadius: 12,
-                    border: '1px solid #cbd5e1',
+                    padding: '0.95rem 1.2rem',
+                    borderRadius: '0.75rem',
+                    border: '1px solid var(--border)',
                     minWidth: 0,
-                    boxShadow: '0 10px 30px rgba(15, 23, 42, 0.05)',
+                    boxShadow: 'var(--shadow-md)',
                     background: 'white',
+                    fontFamily: 'inherit',
                   }}
                 />
                 <button
                   type="button"
                   style={{
-                    padding: '0.9rem 1.2rem',
-                    borderRadius: 12,
+                    padding: '0.95rem 1.5rem',
+                    borderRadius: '0.75rem',
                     border: 'none',
-                    background: '#0f172a',
+                    background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
                     color: 'white',
                     fontWeight: 700,
-                    boxShadow: '0 15px 30px rgba(15, 23, 42, 0.22)',
+                    boxShadow: 'var(--shadow-md)',
                     cursor: 'pointer',
+                    transition: 'transform 0.2s',
                   }}
+                  onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
                 >
                   {content?.search.buttonText ?? 'Find services'}
                 </button>
@@ -177,14 +181,15 @@ export default function Home() {
                     key={`${item.label}-${idx}`}
                     style={{
                       padding: '0.85rem 1rem',
-                      background: '#fff',
-                      borderRadius: 14,
-                      border: '1px solid #e2e8f0',
-                      boxShadow: '0 14px 40px rgba(15, 23, 42, 0.08)',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white',
+                      borderRadius: '0.75rem',
+                      border: '1px solid var(--border)',
+                      boxShadow: 'var(--shadow-md)',
                     }}
                   >
                     <div style={{ fontWeight: 700, fontSize: '1.15rem' }}>{item.value}</div>
-                    <div style={{ color: '#475569' }}>{item.label}</div>
+                    <div style={{ opacity: 0.9 }}>{item.label}</div>
                   </div>
                 ))}
               </div>
@@ -195,10 +200,10 @@ export default function Home() {
         <section style={{ marginBottom: '3rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
             <div>
-              <h2 style={{ margin: 0, fontSize: '1.7rem' }}>Popular categories</h2>
-              <p style={{ margin: 0, color: '#475569' }}>Everything you need, from repairs to daily help.</p>
+              <h2 style={{ margin: 0, fontSize: '1.7rem', fontWeight: 800, color: 'var(--primary)' }}>Popular categories</h2>
+              <p style={{ margin: 0, color: 'var(--text-secondary)' }}>Everything you need, from repairs to daily help.</p>
             </div>
-            <Link href="/categories" style={{ color: '#0f172a', fontWeight: 700 }}>
+            <Link href="/categories" style={{ color: 'var(--primary)', fontWeight: 700, transition: 'opacity 0.2s', opacity: 0.8 }} onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')} onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.8')}>
               View all →
             </Link>
           </div>
@@ -209,20 +214,30 @@ export default function Home() {
               <div
                 key={`${label}-${idx}`}
                 style={{
-                  padding: '1rem',
-                  background: '#fff',
-                  borderRadius: 14,
-                  border: '1px solid #e2e8f0',
-                  boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08)',
+                  padding: '1.25rem',
+                  background: 'white',
+                  borderRadius: '0.75rem',
+                  border: '1px solid var(--border)',
+                  boxShadow: 'var(--shadow-md)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.85rem',
+                  gap: '1rem',
+                  transition: 'all 0.2s',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md)';
                 }}
               >
-                <div style={{ width: 54, height: 54, borderRadius: 12, background: '#f5f5f5', display: 'grid', placeItems: 'center' }}>
-                  <img src={(cat as any).image} alt={label} width={34} height={34} />
+                <div style={{ width: 56, height: 56, borderRadius: '0.75rem', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'grid', placeItems: 'center' }}>
+                  <img src={(cat as any).image} alt={label} width={36} height={36} />
                 </div>
-                <div style={{ fontWeight: 700 }}>{label}</div>
+                <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{label}</div>
               </div>
               );
             })}
@@ -230,28 +245,27 @@ export default function Home() {
         </section>
 
         <section style={{ marginBottom: '3rem', display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
-          <div style={{ padding: '1.25rem', background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 14px 40px rgba(15, 23, 42, 0.08)' }}>
-            <h3 style={{ margin: '0 0 0.5rem' }}>How it works</h3>
-            <ul style={{ paddingLeft: '1rem', margin: 0, color: '#475569', display: 'grid', gap: '0.4rem' }}>
+          <div style={{ padding: '1.5rem', background: 'white', borderRadius: '0.75rem', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}>
+            <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--primary)' }}>✨ How it works</h3>
+            <ul style={{ paddingLeft: '1rem', margin: 0, color: 'var(--text-secondary)', display: 'grid', gap: '0.5rem' }}>
               <li>Tell us what you need and when.</li>
               <li>We match you with vetted local providers.</li>
               <li>Book instantly and track progress.</li>
               <li>Pay securely when the job is done.</li>
             </ul>
           </div>
-          <div style={{ padding: '1.25rem', background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 14px 40px rgba(15, 23, 42, 0.08)' }}>
-            <h3 style={{ margin: '0 0 0.5rem' }}>Why customers trust us</h3>
-            <p style={{ margin: 0, color: '#475569' }}>
-              Verified professionals, transparent pricing, and support that responds fast. Every booking is covered by our service
-              guarantee.
+          <div style={{ padding: '1.5rem', background: 'white', borderRadius: '0.75rem', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}>
+            <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--secondary)' }}>🛡️ Why customers trust us</h3>
+            <p style={{ margin: 0, color: 'var(--text-secondary)' }}>
+              Verified professionals, transparent pricing, and support that responds fast. Every booking is covered by our service guarantee.
             </p>
           </div>
-          <div style={{ padding: '1.25rem', background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 14px 40px rgba(15, 23, 42, 0.08)' }}>
-            <h3 style={{ margin: '0 0 0.5rem' }}>Become a provider</h3>
-            <p style={{ margin: 0, color: '#475569', marginBottom: '0.75rem' }}>
+          <div style={{ padding: '1.5rem', background: 'white', borderRadius: '0.75rem', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}>
+            <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--accent)' }}>📈 Become a provider</h3>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
               Grow your business with steady requests and simple scheduling tools.
             </p>
-            <Link href="/register" style={{ fontWeight: 700, color: '#0f172a' }}>
+            <Link href="/register" style={{ fontWeight: 700, color: 'var(--primary)' }}>
               Join as provider →
             </Link>
           </div>

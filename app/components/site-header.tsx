@@ -59,31 +59,42 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
         top: 0,
         zIndex: 20,
         backdropFilter: 'blur(12px)',
-        background: 'rgba(247,249,251,0.9)',
-        borderBottom: '1px solid #e2e8f0',
+        background: 'rgba(255, 255, 255, 0.95)',
+        borderBottom: '1px solid var(--border)',
+        boxShadow: 'var(--shadow-sm)',
       }}
     >
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0.9rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <Link href="/" style={{ fontWeight: 700, fontSize: '1.15rem', letterSpacing: 0.2 }}>
-          Find Service Around
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '2rem' }}>
+        <Link href="/" style={{ fontWeight: 800, fontSize: '1.35rem', letterSpacing: -0.5, background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+          ServiceHub
         </Link>
-        <nav style={{ display: 'flex', gap: '1rem', marginLeft: 'auto', alignItems: 'center' }}>
-          <Link href="/browse" style={{ color: '#0f172a' }}>Browse</Link>
-          <Link href="/jobs" style={{ color: '#0f172a' }}>My jobs</Link>
-          <Link href="/about" style={{ color: '#0f172a' }}>
+        <nav style={{ display: 'flex', gap: '2rem', marginLeft: 'auto', alignItems: 'center', fontSize: '0.95rem', fontWeight: 500 }}>
+          <Link href="/browse" style={{ color: 'var(--text-secondary)', transition: 'color 0.2s', opacity: 0.8 }} onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')} onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.8')}>Browse</Link>
+          <Link href="/jobs" style={{ color: 'var(--text-secondary)', transition: 'color 0.2s', opacity: 0.8 }} onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')} onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.8')}>My jobs</Link>
+          <Link href="/about" style={{ color: 'var(--text-secondary)', transition: 'color 0.2s', opacity: 0.8 }} onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')} onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.8')}>
             About
           </Link>
-          <Link href="/contact" style={{ color: '#0f172a' }}>
+          <Link href="/contact" style={{ color: 'var(--text-secondary)', transition: 'color 0.2s', opacity: 0.8 }} onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')} onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.8')}>
             Contact
           </Link>
           {!isLoggedIn && (
             <Link
               href="/login"
               style={{
-                padding: '0.55rem 0.9rem',
-                borderRadius: 10,
-                border: '1px solid #0f172a',
+                padding: '0.65rem 1.2rem',
+                borderRadius: '0.75rem',
+                border: '2px solid var(--primary)',
                 fontWeight: 600,
+                color: 'var(--primary)',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--primary)';
+                e.currentTarget.style.color = 'white';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = 'var(--primary)';
               }}
             >
               Log in
@@ -97,19 +108,24 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.6rem',
+                  gap: '0.75rem',
                   border: 'none',
-                  background: 'transparent',
+                  background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                  color: 'white',
                   cursor: 'pointer',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '0.75rem',
+                  fontWeight: 600,
+                  transition: 'all 0.2s',
                 }}
               >
-                <span style={{ fontWeight: 600, color: '#0f172a' }}>{profileName}</span>
+                <span>{profileName}</span>
                 <img
                   src={profilePic}
                   alt="Profile"
-                  width={36}
-                  height={36}
-                  style={{ borderRadius: '50%', border: '1px solid #e2e8f0', objectFit: 'cover' }}
+                  width={32}
+                  height={32}
+                  style={{ borderRadius: '50%', border: '2px solid white', objectFit: 'cover' }}
                 />
               </button>
               {menuOpen && (
@@ -117,12 +133,12 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
                   style={{
                     position: 'absolute',
                     right: 0,
-                    marginTop: 8,
+                    marginTop: 12,
                     background: 'white',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: 12,
-                    boxShadow: '0 14px 40px rgba(15,23,42,0.12)',
-                    minWidth: 160,
+                    border: '1px solid var(--border)',
+                    borderRadius: '0.75rem',
+                    boxShadow: 'var(--shadow-xl)',
+                    minWidth: 180,
                     overflow: 'hidden',
                     zIndex: 30,
                   }}
@@ -137,16 +153,20 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
                       display: 'block',
                       width: '100%',
                       textAlign: 'left',
-                      padding: '0.85rem 1rem',
+                      padding: '1rem 1.25rem',
                       border: 'none',
                       background: 'transparent',
                       cursor: 'pointer',
-                      color: '#0f172a',
+                      color: 'var(--text-primary)',
+                      fontWeight: 500,
+                      transition: 'background 0.2s',
                     }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-light)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   >
-                    Profile
+                    👤 Profile
                   </button>
-                  <div style={{ height: 1, background: '#e2e8f0' }} />
+                  <div style={{ height: 1, background: 'var(--border)' }} />
                   <button
                     type="button"
                     onClick={() => {
@@ -160,14 +180,18 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
                     style={{
                       width: '100%',
                       textAlign: 'left',
-                      padding: '0.85rem 1rem',
+                      padding: '1rem 1.25rem',
                       border: 'none',
                       background: 'transparent',
                       cursor: 'pointer',
-                      color: '#0f172a',
+                      color: 'var(--danger)',
+                      fontWeight: 500,
+                      transition: 'background 0.2s',
                     }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = '#fee2e2')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   >
-                    Logout
+                    🚪 Logout
                   </button>
                 </div>
               )}
