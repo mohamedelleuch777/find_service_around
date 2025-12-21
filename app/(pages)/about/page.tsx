@@ -17,19 +17,28 @@ export default function AboutPage() {
 
       <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
         <div style={{ padding: '2rem', background: 'white', borderRadius: '0.75rem', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}>
-          <h3 style={{ margin: '0 0 0.75rem', color: 'var(--primary)', fontWeight: 800 }}>🎯 Our Mission</h3>
+          <h3 style={{ margin: '0 0 0.75rem', color: 'var(--primary)', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <i className="fa-solid fa-bullseye" aria-hidden="true" />
+            Our Mission
+          </h3>
           <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
             Empower communities by making quality services accessible to everyone, anytime.
           </p>
         </div>
         <div style={{ padding: '2rem', background: 'white', borderRadius: '0.75rem', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}>
-          <h3 style={{ margin: '0 0 0.75rem', color: 'var(--secondary)', fontWeight: 800 }}>⭐ Our Values</h3>
+          <h3 style={{ margin: '0 0 0.75rem', color: 'var(--secondary)', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <i className="fa-solid fa-star" aria-hidden="true" />
+            Our Values
+          </h3>
           <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
             Trust, transparency, and excellence in every interaction.
           </p>
         </div>
         <div style={{ padding: '2rem', background: 'white', borderRadius: '0.75rem', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}>
-          <h3 style={{ margin: '0 0 0.75rem', color: 'var(--accent)', fontWeight: 800 }}>🚀 Our Vision</h3>
+          <h3 style={{ margin: '0 0 0.75rem', color: 'var(--accent)', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <i className="fa-solid fa-rocket" aria-hidden="true" />
+            Our Vision
+          </h3>
           <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
             Build a global network of service providers and satisfied customers.
           </p>

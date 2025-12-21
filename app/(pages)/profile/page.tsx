@@ -15,7 +15,7 @@ function ProfilePageInner() {
   const defaultCountry = process.env.NEXT_PUBLIC_DEFAULT_COUNTRY || 'Tunisia';
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileName, setProfileName] = useState('Guest');
-  const [profilePic, setProfilePic] = useState('/avatar-placeholder.svg');
+  const [profilePic, setProfilePic] = useState<string | null>(null);
   const [resolvedUserId, setResolvedUserId] = useState<string | null>(null);
   const [fallbackEmail, setFallbackEmail] = useState('');
   const [accountType, setAccountType] = useState<'user' | 'provider'>('user');
@@ -222,7 +222,7 @@ function ProfilePageInner() {
           const fullName = `${data.profile.firstName ?? ''} ${data.profile.lastName ?? ''}`.trim() || 'User';
           setProfileName(fullName);
           if (data.profile.photoDataUrl) setProfilePic(data.profile.photoDataUrl);
-          else setProfilePic('/avatar-placeholder.svg');
+          else setProfilePic(null);
         } else {
           setEmail(fEmail);
           setCountry(defaultCountry);
@@ -376,18 +376,38 @@ function ProfilePageInner() {
               <div style={{ width: 120, height: 120, borderRadius: '50%', background: '#e2e8f0', animation: 'shimmer 2s infinite' }} />
             ) : (
               <>
-                <img
-                  src={photoDataUrl || '/avatar-placeholder.svg'}
-                  alt="Profile"
-                  style={{
-                    width: 120,
-                    height: 120,
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    border: '4px solid #e2e8f0',
-                    boxShadow: '0 8px 24px rgba(15,23,42,0.12)',
-                  }}
-                />
+                {photoDataUrl ? (
+                  <img
+                    src={photoDataUrl}
+                    alt="Profile"
+                    style={{
+                      width: 120,
+                      height: 120,
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '4px solid #e2e8f0',
+                      boxShadow: '0 8px 24px rgba(15,23,42,0.12)',
+                    }}
+                  />
+                ) : (
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      width: 120,
+                      height: 120,
+                      borderRadius: '50%',
+                      border: '4px solid #e2e8f0',
+                      boxShadow: '0 8px 24px rgba(15,23,42,0.12)',
+                      background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
+                      display: 'grid',
+                      placeItems: 'center',
+                      color: 'white',
+                      fontSize: '2rem',
+                    }}
+                  >
+                    <i className="fa-solid fa-user" />
+                  </div>
+                )}
                 {isOwnProfile && !initializing && (
                   <label
                     style={{
@@ -410,7 +430,7 @@ function ProfilePageInner() {
                     onMouseEnter={(e) => (e.currentTarget.style.background = '#1e293b')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = '#0f172a')}
                   >
-                    <span style={{ fontSize: '1.2rem' }}>📷</span>
+                    <i className="fa-solid fa-camera" aria-hidden="true" />
                     <input
                       type="file"
                       accept="image/*"
@@ -464,7 +484,10 @@ function ProfilePageInner() {
               transition: 'all 0.2s',
             }}
           >
-            👤 Basic Info
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <i className="fa-solid fa-user" aria-hidden="true" />
+              Basic Info
+            </span>
           </button>
           <button
             type="button"
@@ -481,7 +504,10 @@ function ProfilePageInner() {
               transition: 'all 0.2s',
             }}
           >
-            📍 Location
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <i className="fa-solid fa-location-dot" aria-hidden="true" />
+              Location
+            </span>
           </button>
           {accountType === 'provider' && (
             <button
@@ -499,7 +525,10 @@ function ProfilePageInner() {
                 transition: 'all 0.2s',
               }}
             >
-              💼 Services
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                <i className="fa-solid fa-briefcase" aria-hidden="true" />
+                Services
+              </span>
             </button>
           )}
           <button
@@ -517,7 +546,10 @@ function ProfilePageInner() {
               transition: 'all 0.2s',
             }}
           >
-            🖼️ Gallery
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <i className="fa-solid fa-images" aria-hidden="true" />
+              Gallery
+            </span>
           </button>
         </div>
 
@@ -989,7 +1021,12 @@ function ProfilePageInner() {
         >
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
-              <h3 style={{ margin: 0 }}>📸 Your Gallery</h3>
+              <h3 style={{ margin: 0 }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <i className="fa-solid fa-camera" aria-hidden="true" />
+                  Your Gallery
+                </span>
+              </h3>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <input
                   type="text"

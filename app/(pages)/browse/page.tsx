@@ -185,7 +185,10 @@ export default function BrowsePage() {
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <span style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '0.95rem' }}>🔍 Categories & Jobs</span>
+            <span style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '0.95rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <i className="fa-solid fa-layer-group" aria-hidden="true" />
+              Categories & Jobs
+            </span>
             <div style={{ display: 'grid', gap: '0.75rem' }}>
               {loading ? (
                 <>
@@ -242,7 +245,10 @@ export default function BrowsePage() {
           </div>
 
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <span style={{ fontWeight: 600, color: 'var(--primary)', fontSize: '0.9rem' }}>📍 Distance (km)</span>
+              <span style={{ fontWeight: 600, color: 'var(--primary)', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                <i className="fa-solid fa-route" aria-hidden="true" />
+                Distance (km)
+              </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <input
                 type="range"
@@ -259,7 +265,10 @@ export default function BrowsePage() {
           </label>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <span style={{ fontWeight: 600, color: 'var(--primary)', fontSize: '0.9rem' }}>🗺️ Center</span>
+            <span style={{ fontWeight: 600, color: 'var(--primary)', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <i className="fa-solid fa-location-crosshairs" aria-hidden="true" />
+              Center
+            </span>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button
                 type="button"
@@ -381,8 +390,16 @@ export default function BrowsePage() {
                     <div>
                       <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{`${p.firstName} ${p.lastName}`.trim() || 'Provider'}</div>
                       <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{p.jobName || p.categoryName}</div>
-                      <div style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.9rem' }}>
-                        {p.ratingAvg ? `${p.ratingAvg.toFixed(1)} ⭐` : 'Unrated'} {p.ratingCount ? `(${p.ratingCount})` : ''}
+                      <div style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                        {p.ratingAvg ? (
+                          <>
+                            {p.ratingAvg.toFixed(1)}
+                            <i className="fa-solid fa-star" aria-hidden="true" />
+                          </>
+                        ) : (
+                          'Unrated'
+                        )}{' '}
+                        {p.ratingCount ? `(${p.ratingCount})` : ''}
                       </div>
                       <div style={{ color: p.providerWorkStatus && p.providerWorkStatus !== 'available' ? '#b91c1c' : '#0f172a', fontWeight: 600 }}>
                         Status: {p.providerWorkStatus ? p.providerWorkStatus.replace(/_/g, ' ') : 'available'}
@@ -393,8 +410,9 @@ export default function BrowsePage() {
                   {p.city || p.province || p.country} {p.postalCode ? `• ${p.postalCode}` : ''}
                 </div>
                 {p.phone && (
-                  <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.9rem' }}>
-                    📞 {p.phone}
+                  <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <i className="fa-solid fa-phone" aria-hidden="true" />
+                    {p.phone}
                   </div>
                 )}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
@@ -514,16 +532,18 @@ export default function BrowsePage() {
                     onClick={() => setSelectedProvider(null)}
                     style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-tertiary)', fontWeight: 700, fontSize: '1.2rem', padding: '0.5rem' }}
                   >
-                    ✕
+                    <i className="fa-solid fa-xmark" aria-hidden="true" />
                   </button>
                 </div>
-                <div style={{ color: 'var(--text-secondary)', marginTop: '0.75rem', fontSize: '0.9rem' }}>
-                  📍 {selectedProvider.address || selectedProvider.city || selectedProvider.province || selectedProvider.country}
+                <div style={{ color: 'var(--text-secondary)', marginTop: '0.75rem', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <i className="fa-solid fa-location-dot" aria-hidden="true" />
+                  {selectedProvider.address || selectedProvider.city || selectedProvider.province || selectedProvider.country}
                 </div>
                 {selectedProvider.email && (
                   <div style={{ marginTop: '0.5rem' }}>
-                    <a href={`mailto:${selectedProvider.email}`} style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.9rem' }}>
-                      📧 {selectedProvider.email}
+                    <a href={`mailto:${selectedProvider.email}`} style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <i className="fa-solid fa-envelope" aria-hidden="true" />
+                      {selectedProvider.email}
                     </a>
                   </div>
                 )}

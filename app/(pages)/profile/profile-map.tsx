@@ -21,9 +21,11 @@ function getLeaflet() {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const L = require('leaflet');
   markerIconSingleton = L.divIcon({
-    className: 'profile-map-pin',
+    html: `<i class="fa-solid fa-location-dot" style="color: #e11d48; font-size: 24px; text-shadow: 0 2px 6px rgba(0,0,0,0.3); display: block; width: 24px; height: 24px; line-height: 24px; text-align: center;"></i>`,
     iconSize: [24, 24],
-    iconAnchor: [12, 12],
+    iconAnchor: [12, 24],
+    popupAnchor: [0, -16],
+    className: '',
   });
   leafletSingleton = L;
   return L;

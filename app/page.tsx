@@ -16,7 +16,7 @@ type HomeContent = {
     leftBody: string;
   };
   search: { placeholder: string; buttonText: string };
-  categories: { title: string; image: string }[];
+  categories: { id?: string; title?: string; name?: string; image?: string }[];
   highlights: { label: string; value: string }[];
 };
 
@@ -24,6 +24,18 @@ export default function Home() {
   const [slide, setSlide] = useState(0);
   const [content, setContent] = useState<HomeContent | null>(null);
   const [loading, setLoading] = useState(true);
+  const categoryIconMap: Record<string, string> = {
+    plumbing: 'fa-faucet',
+    electricity: 'fa-bolt',
+    housekeeping: 'fa-broom',
+    'windows-blinds': 'fa-window-maximize',
+    'air-conditioning': 'fa-snowflake',
+    handyman: 'fa-screwdriver-wrench',
+    'washing-machine': 'fa-soap',
+    painting: 'fa-paint-roller',
+    babysitting: 'fa-baby',
+    gardening: 'fa-seedling',
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -241,6 +253,8 @@ export default function Home() {
             ) : (
               content?.categories?.map((cat, idx) => {
                 const label = (cat as any).title || (cat as any).name || 'Category';
+                const categoryId = (cat as any).id || label.toLowerCase().replace(/\s+/g, '-');
+                const iconClass = categoryIconMap[categoryId] || 'fa-briefcase';
                 return (
                 <div
                   key={`${label}-${idx}`}
@@ -265,8 +279,8 @@ export default function Home() {
                     e.currentTarget.style.boxShadow = 'var(--shadow-md)';
                   }}
                 >
-                  <div style={{ width: 56, height: 56, borderRadius: '0.75rem', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'grid', placeItems: 'center' }}>
-                    <img src={(cat as any).image} alt={label} width={36} height={36} />
+                  <div style={{ width: 56, height: 56, borderRadius: '0.75rem', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'grid', placeItems: 'center', color: 'white', fontSize: '1.4rem' }}>
+                    <i className={`fa-solid ${iconClass}`} aria-hidden="true" />
                   </div>
                   <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{label}</div>
                 </div>
@@ -278,7 +292,10 @@ export default function Home() {
 
         <section style={{ marginBottom: '3rem', display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
           <div style={{ padding: '1.5rem', background: 'white', borderRadius: '0.75rem', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}>
-            <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--primary)' }}>✨ How it works</h3>
+            <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--primary)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <i className="fa-solid fa-wand-magic-sparkles" aria-hidden="true" />
+              How it works
+            </h3>
             <ul style={{ paddingLeft: '1rem', margin: 0, color: 'var(--text-secondary)', display: 'grid', gap: '0.5rem' }}>
               <li>Tell us what you need and when.</li>
               <li>We match you with vetted local providers.</li>
@@ -287,13 +304,19 @@ export default function Home() {
             </ul>
           </div>
           <div style={{ padding: '1.5rem', background: 'white', borderRadius: '0.75rem', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}>
-            <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--secondary)' }}>🛡️ Why customers trust us</h3>
+            <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--secondary)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <i className="fa-solid fa-shield-halved" aria-hidden="true" />
+              Why customers trust us
+            </h3>
             <p style={{ margin: 0, color: 'var(--text-secondary)' }}>
               Verified professionals, transparent pricing, and support that responds fast. Every booking is covered by our service guarantee.
             </p>
           </div>
           <div style={{ padding: '1.5rem', background: 'white', borderRadius: '0.75rem', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)', transition: 'all 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}>
-            <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--accent)' }}>📈 Become a provider</h3>
+            <h3 style={{ margin: '0 0 0.75rem', fontSize: '1.15rem', fontWeight: 800, color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <i className="fa-solid fa-chart-line" aria-hidden="true" />
+              Become a provider
+            </h3>
             <p style={{ margin: 0, color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
               Grow your business with steady requests and simple scheduling tools.
             </p>

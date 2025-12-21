@@ -10,13 +10,13 @@ type Props = {
   prefilledPhoto?: string | null;
 };
 
-const PLACEHOLDER = '/avatar-placeholder.svg';
+const PLACEHOLDER: string | null = null;
 
 export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileName, setProfileName] = useState(prefilledName || 'Guest');
-  const [profilePic, setProfilePic] = useState(prefilledPhoto || PLACEHOLDER);
+  const [profilePic, setProfilePic] = useState<string | null>(prefilledPhoto || PLACEHOLDER);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -130,13 +130,30 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
                 }}
               >
                 <span>{profileName}</span>
-                <img
-                  src={profilePic}
-                  alt="Profile"
-                  width={32}
-                  height={32}
-                  style={{ borderRadius: '50%', border: '2px solid white', objectFit: 'cover' }}
-                />
+                {profilePic ? (
+                  <img
+                    src={profilePic}
+                    alt="Profile"
+                    width={32}
+                    height={32}
+                    style={{ borderRadius: '50%', border: '2px solid white', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: '50%',
+                      border: '2px solid white',
+                      display: 'grid',
+                      placeItems: 'center',
+                      background: 'rgba(255,255,255,0.2)',
+                    }}
+                  >
+                    <i className="fa-solid fa-user" />
+                  </span>
+                )}
               </button>
               {menuOpen && (
                 <div
@@ -174,7 +191,10 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
                     onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-light)')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   >
-                    👤 Profile
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <i className="fa-solid fa-user" aria-hidden="true" />
+                      Profile
+                    </span>
                   </button>
                   <div style={{ height: 1, background: 'var(--border)' }} />
                   <button
@@ -201,7 +221,10 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
                     onMouseEnter={(e) => (e.currentTarget.style.background = '#fee2e2')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   >
-                    🚪 Logout
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <i className="fa-solid fa-right-from-bracket" aria-hidden="true" />
+                      Logout
+                    </span>
                   </button>
                 </div>
               )}
