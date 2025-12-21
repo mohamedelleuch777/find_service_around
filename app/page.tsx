@@ -111,7 +111,7 @@ export default function Home() {
                 </div>
 
                 <div className="home__hero-card">
-                  <div className="home__hero-subtitle" style={{ background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)', color: 'white' }}>
+                  <div className="home__hero-subtitle" style={{ background: 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)', color: 'white' }}>
                     {content?.hero.subtitle ?? 'Trusted on-demand home services'}
                   </div>
                   <h1 className="home__hero-title" style={{ color: 'var(--primary)' }}>
