@@ -111,7 +111,7 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm }: 
     }).addTo(mapRef.current);
     
     // Show radius circle if distance filter is active
-    if (radiusKm && radiusKm > 0) {
+    if (radiusKm !== undefined && radiusKm > 0) {
       radiusRef.current = L.circle([center.lat, center.lon], {
         radius: radiusKm * 1000,
         color: '#0f172a',
@@ -121,7 +121,7 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm }: 
         fillOpacity: 0.12,
       }).addTo(mapRef.current);
     }
-  }, [center.lat, center.lon, radiusKm]);
+  }, [center.lat, center.lon, radiusKm ?? 0]);
 
   useEffect(() => {
     return () => {
