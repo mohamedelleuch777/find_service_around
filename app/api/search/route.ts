@@ -95,6 +95,7 @@ export async function GET(req: NextRequest) {
         latitude: p.latitude ?? null,
         longitude: p.longitude ?? null,
         distance,
+        providerWorkStatus: p.providerWorkStatus || 'available',
       };
     })
     .filter(Boolean) as any[];

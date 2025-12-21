@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '../../../lib/firestore';
 
-type JobStatus = 'in_progress' | 'pending_provider' | 'pending_client' | 'closed' | 'disputed' | 'canceled';
+type JobStatus = 'pending_provider_accept' | 'in_progress' | 'pending_provider' | 'pending_client' | 'closed' | 'disputed' | 'canceled' | 'declined';
 
 export async function GET(req: NextRequest) {
   const db = getDb();
@@ -39,13 +39,20 @@ export async function POST(req: NextRequest) {
   const { clientId, providerId, categoryId, jobId, title } = body;
   if (!clientId || !providerId) return NextResponse.json({ error: 'clientId and providerId are required' }, { status: 400 });
 
+  // ensure provider is available to accept new jobs
+  const providerDoc = await db.collection('profiles').doc(providerId).get();
+  const provider = providerDoc.exists ? providerDoc.data() || {} : {};
+  if (provider.providerWorkStatus && provider.providerWorkStatus !== 'available') {
+    return NextResponse.json({ error: 'Provider is not available right now' }, { status: 400 });
+  }
+
   const payload = {
     clientId,
     providerId,
     categoryId: categoryId || '',
     jobId: jobId || '',
     title: title || '',
-    status: 'in_progress' as JobStatus,
+    status: 'pending_provider_accept' as JobStatus,
     participants: [clientId, providerId],
     createdAt: Date.now(),
     updatedAt: Date.now(),

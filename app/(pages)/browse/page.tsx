@@ -24,6 +24,7 @@ type Provider = {
   address: string;
   postalCode: string;
   photoDataUrl?: string;
+  providerWorkStatus?: string;
 };
 
 type Option = { id: string; name: string; categoryId?: string };
@@ -256,6 +257,7 @@ export default function BrowsePage() {
         <div style={{ display: 'grid', gap: '1.2rem' }}>
           <BrowseMap
             center={center}
+            radiusKm={distanceKm || undefined}
             markers={markerData}
             onMarkerClick={(m) => {
               const found = filteredProviders.find((p) => p.id === m.id) || null;
@@ -320,6 +322,9 @@ export default function BrowsePage() {
                       <div style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '0.9rem' }}>
                         {p.ratingAvg ? `${p.ratingAvg.toFixed(1)} ⭐` : 'Unrated'} {p.ratingCount ? `(${p.ratingCount})` : ''}
                       </div>
+                      <div style={{ color: p.providerWorkStatus && p.providerWorkStatus !== 'available' ? '#b91c1c' : '#0f172a', fontWeight: 600 }}>
+                        Status: {p.providerWorkStatus ? p.providerWorkStatus.replace(/_/g, ' ') : 'available'}
+                      </div>
                     </div>
                   </div>
                 <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
@@ -351,26 +356,31 @@ export default function BrowsePage() {
                   <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
                     <button
                       type="button"
+                      disabled={p.providerWorkStatus && p.providerWorkStatus !== 'available'}
                       onClick={async (e) => {
                         e.stopPropagation();
                         if (!currentUserId) return;
+                        if (p.providerWorkStatus && p.providerWorkStatus !== 'available') {
+                          alert('Provider is not available right now.');
+                          return;
+                        }
                         try {
                           const res = await fetch('/api/jobs', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              clientId: currentUserId,
-                              providerId: p.id,
-                              categoryId: p.categoryId,
-                              jobId: p.jobId,
-                              title: p.jobName || p.categoryName,
-                            }),
-                          });
-                          const data = await res.json();
-                          if (res.ok) {
-                            setJobs([data.job, ...jobs]);
-                            alert('Job created with provider');
-                          } else {
+                          body: JSON.stringify({
+                            clientId: currentUserId,
+                            providerId: p.id,
+                            categoryId: p.categoryId,
+                            jobId: p.jobId,
+                            title: p.jobName || p.categoryName,
+                          }),
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                          setJobs([data.job, ...jobs]);
+                          alert('Job request sent to provider for acceptance');
+                        } else {
                             alert(data.error || 'Failed to hire');
                           }
                         } catch (err) {
@@ -391,7 +401,7 @@ export default function BrowsePage() {
                       onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
                       onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
                     >
-                      Hire
+                      {p.providerWorkStatus && p.providerWorkStatus !== 'available' ? 'Unavailable' : 'Hire'}
                     </button>
                     <button
                       type="button"

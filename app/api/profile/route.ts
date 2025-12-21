@@ -25,6 +25,7 @@ export async function POST(request: Request) {
     userId,
     email: body.email ?? '',
     accountType: body.accountType === 'provider' ? 'provider' : 'user',
+    providerWorkStatus: body.providerWorkStatus || 'available',
     firstName: body.firstName,
     lastName: body.lastName,
     age: body.age === undefined || body.age === '' ? null : Number(body.age),

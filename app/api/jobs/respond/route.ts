@@ -109,6 +109,52 @@ export async function POST(req: NextRequest) {
   }
 
   if (job.status === 'pending_client' && userId === job.clientId) {
+    const providerStarted = job.endRequest?.by === 'provider' && !job.counterRequest;
+
+    if (providerStarted) {
+      if (action === 'accept') {
+        const closure = {
+          reason: endReason || job?.endRequest?.reason || 'completed',
+          clientRating: ratingValue,
+          clientComment: comment || '',
+          providerRating: job?.endRequest?.rating ?? null,
+          providerComment: job?.endRequest?.comment ?? '',
+          closedAt: Date.now(),
+        };
+        await docRef.set(
+          {
+            status: 'closed',
+            closure,
+            updatedAt: Date.now(),
+          },
+          { merge: true }
+        );
+        if (job.endRequest?.rating !== undefined && job.endRequest?.rating !== null) {
+          await applyRating(db, job.clientId, job.providerId, jobId, job.endRequest.rating, job.endRequest.comment || '');
+        }
+        if (ratingValue !== null || comment) {
+          await applyRating(db, job.providerId, job.clientId, jobId, ratingValue, comment || '');
+        }
+        return NextResponse.json({ job: { id: jobId, ...job, status: 'closed', closure } });
+      }
+      if (action === 'escalate') {
+        await docRef.set(
+          {
+            status: 'disputed',
+            dispute: {
+              by: 'client',
+              reason: endReason,
+              comment: comment || '',
+              at: Date.now(),
+            },
+            updatedAt: Date.now(),
+          },
+          { merge: true }
+        );
+        return NextResponse.json({ job: { id: jobId, ...job, status: 'disputed' } });
+      }
+    }
+
     if (action === 'accept') {
       const closure = {
         reason: endReason || job?.endRequest?.reason || job?.counterRequest?.reason || 'completed',
