@@ -67,6 +67,7 @@ export default function BrowsePage() {
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [userLocationLoaded, setUserLocationLoaded] = useState(false);
+  const [userName, setUserName] = useState<string>('');
   const [endForm, setEndForm] = useState<{ jobId: string; reason: string; comment: string; rating: string }>({
     jobId: '',
     reason: 'completed',
@@ -125,6 +126,10 @@ export default function BrowsePage() {
         const data = await res.json();
         if (data.profile?.latitude && data.profile?.longitude) {
           setCenter({ lat: data.profile.latitude, lon: data.profile.longitude });
+        }
+        if (data.profile?.firstName || data.profile?.lastName) {
+          const fullName = `${data.profile.firstName || ''} ${data.profile.lastName || ''}`.trim();
+          setUserName(fullName || 'User');
         }
       } catch {
         // ignore
@@ -315,6 +320,7 @@ export default function BrowsePage() {
             radiusKm={distanceKm || undefined}
             markers={markerData}
             showUserMarker={userLocationLoaded}
+            userName={userName}
             onMarkerClick={(m) => {
               const found = filteredProviders.find((p) => p.id === m.id) || null;
               setSelectedProvider(found);

@@ -20,6 +20,7 @@ type Props = {
   onMarkerClick?: (marker: Marker) => void;
   radiusKm?: number;
   showUserMarker?: boolean;
+  userName?: string;
 };
 
 const DEFAULT_ZOOM = 11;
@@ -55,7 +56,7 @@ function getLeaflet() {
   return L;
 }
 
-export default function BrowseMap({ center, markers, onMarkerClick, radiusKm, showUserMarker = true }: Props) {
+export default function BrowseMap({ center, markers, onMarkerClick, radiusKm, showUserMarker = true, userName }: Props) {
   const mapRef = useRef<any>(null);
   const markerLayerRef = useRef<any>(null);
   const radiusRef = useRef<any>(null);
@@ -128,6 +129,9 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm, sh
       centerMarkerRef.current = L.marker([center.lat, center.lon], { 
         icon: userHomeIconSingleton 
       }).addTo(mapRef.current);
+      
+      const userPopupContent = `<div style="font-weight:700; color: #0f172a;">🏠 Your Location</div><div style="color: #475569; margin-top: 4px;">${userName || 'Your home'}</div>`;
+      centerMarkerRef.current.bindPopup(userPopupContent);
     }
     
     // Show job icon for each provider's location
@@ -135,6 +139,14 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm, sh
       const jobMarker = L.marker([marker.lat, marker.lon], { 
         icon: jobIconSingleton 
       }).addTo(mapRef.current);
+      
+      const providerPopupContent = `<div style="font-weight:700; color: #0f172a;">${marker.label}</div><div style="color: #475569; margin-top: 4px;">${marker.job || 'Service'}</div><div style="color: #94a3b8; margin-top: 2px;">${marker.category || ''}</div>`;
+      jobMarker.bindPopup(providerPopupContent);
+      
+      jobMarker.on('click', () => {
+        if (clickRef.current) clickRef.current(marker);
+      });
+      
       providerCirclesRef.current.push(jobMarker);
     });
     
@@ -149,7 +161,7 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm, sh
         fillOpacity: 0.12,
       }).addTo(mapRef.current);
     }
-  }, [center.lat, center.lon, radiusKm ?? 0, markers, showUserMarker]);
+  }, [center.lat, center.lon, radiusKm ?? 0, markers, showUserMarker, userName]);
 
   useEffect(() => {
     return () => {
