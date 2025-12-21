@@ -156,6 +156,14 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
             </div>
           )}
         </nav>
+        {navOpen && (
+          <button
+            type="button"
+            className="site-header__overlay"
+            aria-label="Close navigation"
+            onClick={() => setNavOpen(false)}
+          />
+        )}
       </div>
     </header>
   );
