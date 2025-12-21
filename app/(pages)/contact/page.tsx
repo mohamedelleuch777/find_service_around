@@ -1,6 +1,10 @@
+import SiteHeader from '../../components/site-header';
+
 export default function ContactPage() {
   return (
-    <main style={{ padding: '3rem 1.5rem', maxWidth: 960, margin: '0 auto' }}>
+    <>
+      <SiteHeader />
+      <main style={{ padding: '3rem 1.5rem', maxWidth: 960, margin: '0 auto' }}>
       <div style={{ background: 'white', padding: '2.5rem', borderRadius: '1rem', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}>
         <h1 style={{ margin: '0 0 1rem', fontSize: '2.5rem', fontWeight: 800, background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Get in Touch</h1>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '1.1rem' }}>
@@ -19,5 +23,6 @@ export default function ContactPage() {
         </ul>
       </div>
     </main>
+    </>
   );
 }

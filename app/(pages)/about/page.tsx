@@ -1,6 +1,10 @@
+import SiteHeader from '../../components/site-header';
+
 export default function AboutPage() {
   return (
-    <main style={{ padding: '3rem 1.5rem', maxWidth: 960, margin: '0 auto' }}>
+    <>
+      <SiteHeader />
+      <main style={{ padding: '3rem 1.5rem', maxWidth: 960, margin: '0 auto' }}>
       <div style={{ marginBottom: '3rem' }}>
         <h1 style={{ margin: '0 0 1rem', fontSize: '2.5rem', fontWeight: 800, background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>About ServiceHub</h1>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem', fontSize: '1.1rem', lineHeight: 1.8 }}>
@@ -32,5 +36,6 @@ export default function AboutPage() {
         </div>
       </div>
     </main>
+    </>
   );
 }
