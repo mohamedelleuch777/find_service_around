@@ -20,6 +20,12 @@ type Job = {
   updatedAt?: number;
 };
 
+type UserProfile = {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+};
+
 const END_REASONS = [
   { id: 'completed', name: 'Completed' },
   { id: 'not_satisfied', name: 'Not satisfied' },
@@ -34,6 +40,8 @@ export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [currentUserRole, setCurrentUserRole] = useState<'client' | 'provider' | null>(null);
+  const [userProfiles, setUserProfiles] = useState<Record<string, UserProfile>>({});
   const [endForm, setEndForm] = useState<{ jobId: string; reason: string; comment: string; rating: string }>({
     jobId: '',
     reason: 'completed',
@@ -50,6 +58,20 @@ export default function JobsPage() {
   useEffect(() => {
     const uid = typeof window !== 'undefined' ? localStorage.getItem('profileUserId') || 'demo-user' : 'demo-user';
     setCurrentUserId(uid);
+    
+    // Fetch current user profile to determine if they're a client or provider
+    const fetchCurrentUserProfile = async () => {
+      try {
+        const res = await fetch(`/api/profile?userId=${encodeURIComponent(uid)}`);
+        const data = await res.json();
+        if (data.profile?.accountType) {
+          setCurrentUserRole(data.profile.accountType === 'provider' ? 'provider' : 'client');
+        }
+      } catch {
+        // ignore
+      }
+    };
+    fetchCurrentUserProfile();
   }, []);
 
   useEffect(() => {
@@ -59,7 +81,34 @@ export default function JobsPage() {
       try {
         const res = await fetch(`/api/jobs?userId=${encodeURIComponent(currentUserId)}&role=any`);
         const data = await res.json();
-        setJobs(data.jobs || []);
+        const jobs_list = data.jobs || [];
+        setJobs(jobs_list);
+        
+        // Fetch all unique user IDs (clients and providers)
+        const userIds = new Set<string>();
+        jobs_list.forEach((j: Job) => {
+          userIds.add(j.clientId);
+          userIds.add(j.providerId);
+        });
+        
+        // Fetch profiles for all users
+        const profiles: Record<string, UserProfile> = {};
+        for (const userId of userIds) {
+          try {
+            const profileRes = await fetch(`/api/profile?userId=${encodeURIComponent(userId)}`);
+            const profileData = await profileRes.json();
+            if (profileData.profile) {
+              profiles[userId] = {
+                id: userId,
+                firstName: profileData.profile.firstName,
+                lastName: profileData.profile.lastName,
+              };
+            }
+          } catch {
+            // ignore
+          }
+        }
+        setUserProfiles(profiles);
       } catch {
         setJobs([]);
       } finally {
@@ -177,9 +226,34 @@ export default function JobsPage() {
     ...disputed.map((j) => ({ ...j, section: 'Disputed' })),
     ...closed.map((j) => ({ ...j, section: 'Closed' })),
   ];
-  const showClient = allJobs.some((j) => j.clientId !== currentUserId);
-  const showProvider = allJobs.some((j) => j.providerId !== currentUserId);
-  const colCount = 4 + (showClient ? 1 : 0) + (showProvider ? 1 : 0);
+  
+  // Show client column only if current user is a provider
+  const showClientColumn = currentUserRole === 'provider';
+  // Show provider column only if current user is a client
+  const showProviderColumn = currentUserRole === 'client';
+  const colCount = 4 + (showClientColumn ? 1 : 0) + (showProviderColumn ? 1 : 0);
+
+  const getUserName = (userId: string) => {
+    const profile = userProfiles[userId];
+    if (profile?.firstName || profile?.lastName) {
+      return `${profile.firstName || ''} ${profile.lastName || ''}`.trim();
+    }
+    return userId;
+  };
+
+  const UserNameLink = ({ userId }: { userId: string }) => {
+    const name = getUserName(userId);
+    return (
+      <a
+        href={`/profile?userId=${encodeURIComponent(userId)}`}
+        style={{ color: '#0f172a', textDecoration: 'none', fontWeight: 600, cursor: 'pointer' }}
+        onMouseEnter={(e) => (e.currentTarget.style.color = '#0369a1')}
+        onMouseLeave={(e) => (e.currentTarget.style.color = '#0f172a')}
+      >
+        {name}
+      </a>
+    );
+  };
 
   const statusStyle = (status: string) => {
     const styles: Record<string, { bg: string; color: string }> = {
@@ -217,8 +291,8 @@ export default function JobsPage() {
             <tr style={{ background: '#f8fafc' }}>
               <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Section</th>
               <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Job</th>
-              {showClient && <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Client</th>}
-              {showProvider && <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Provider</th>}
+              {showClientColumn && <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Client</th>}
+              {showProviderColumn && <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Provider</th>}
               <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Status</th>
               <th style={{ textAlign: 'left', padding: '0.75rem 0.65rem', borderBottom: '1px solid #e2e8f0' }}>Actions</th>
             </tr>
@@ -259,8 +333,8 @@ export default function JobsPage() {
                     {job.acceptance && <div style={{ color: '#0f172a', marginTop: 4 }}>Accepted by provider</div>}
                     {job.decline && <div style={{ color: '#b91c1c', marginTop: 4 }}>Declined by provider</div>}
                   </td>
-                  {showClient && <td style={{ padding: '0.9rem 0.65rem', color: '#475569' }}>{job.clientId}</td>}
-                  {showProvider && <td style={{ padding: '0.9rem 0.65rem', color: '#475569' }}>{job.providerId}</td>}
+                  {showClientColumn && <td style={{ padding: '0.9rem 0.65rem', color: '#475569' }}><UserNameLink userId={job.clientId} /></td>}
+                  {showProviderColumn && <td style={{ padding: '0.9rem 0.65rem', color: '#475569' }}><UserNameLink userId={job.providerId} /></td>}
                   <td style={{ padding: '0.9rem 0.65rem', color: '#0f172a' }}>
                     {(() => {
                       const { bg, color } = statusStyle(job.status);
