@@ -94,7 +94,7 @@ function ProfilePageInner() {
     setIsLoggedIn(true);
     setResolvedUserId(userId);
     setFallbackEmail(pendingEmail);
-    setInitializing(false);
+    // Do NOT set initializing to false here - wait for profile data to load
   }, [router, searchParams]);
 
   useEffect(() => {
