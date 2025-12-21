@@ -330,6 +330,7 @@ export default function BrowsePage() {
             markers={markerData}
             showUserMarker={userLocationLoaded}
             userName={userName}
+            currentUserId={currentUserId}
             onMarkerClick={(m) => {
               const found = filteredProviders.find((p) => p.id === m.id) || null;
               setSelectedProvider(found);
