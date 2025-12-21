@@ -176,24 +176,12 @@ export default function Home() {
                   <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', fontSize: '1.02rem' }}>
                     {content?.hero.body}
                   </p>
-                  <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-                    <input
-                      placeholder={content?.search.placeholder ?? 'What do you need help with?'}
-                      style={{
-                        flex: '1 1 240px',
-                        padding: '0.95rem 1.2rem',
-                        borderRadius: '0.75rem',
-                        border: '1px solid var(--border)',
-                        minWidth: 0,
-                        boxShadow: 'var(--shadow-md)',
-                        background: 'white',
-                        fontFamily: 'inherit',
-                      }}
-                    />
+                  <div style={{ marginBottom: '1rem' }}>
                     <button
                       type="button"
                       style={{
-                        padding: '0.95rem 1.5rem',
+                        width: '100%',
+                        padding: '1rem 1.5rem',
                         borderRadius: '0.75rem',
                         border: 'none',
                         background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
@@ -279,7 +267,7 @@ export default function Home() {
                     e.currentTarget.style.boxShadow = 'var(--shadow-md)';
                   }}
                 >
-                  <div style={{ width: 56, height: 56, borderRadius: '0.75rem', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'grid', placeItems: 'center', color: 'white', fontSize: '1.4rem' }}>
+                  <div style={{ width: 56, height: 56, borderRadius: '0.75rem', background: 'transparent', border: '1px solid var(--border)', display: 'grid', placeItems: 'center', color: 'var(--primary)', fontSize: '1.4rem' }}>
                     <i className={`fa-solid ${iconClass}`} aria-hidden="true" />
                   </div>
                   <div style={{ fontWeight: 700, color: 'var(--primary)' }}>{label}</div>
