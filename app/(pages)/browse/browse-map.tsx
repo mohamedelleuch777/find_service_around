@@ -18,6 +18,7 @@ type Props = {
   markers: Marker[];
   onMarkerClick?: (marker: Marker) => void;
   radiusKm?: number;
+  showUserMarker?: boolean;
 };
 
 const DEFAULT_ZOOM = 8;
@@ -37,7 +38,7 @@ function getLeaflet() {
   return L;
 }
 
-export default function BrowseMap({ center, markers, onMarkerClick, radiusKm }: Props) {
+export default function BrowseMap({ center, markers, onMarkerClick, radiusKm, showUserMarker = true }: Props) {
   const mapRef = useRef<any>(null);
   const markerLayerRef = useRef<any>(null);
   const radiusRef = useRef<any>(null);
@@ -106,14 +107,16 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm }: 
       firstMarkerRef.current = null;
     }
     
-    // Always show a dark blue circle at user's location
-    centerMarkerRef.current = L.circleMarker([center.lat, center.lon], {
-      radius: 8,
-      color: '#1e40af',
-      weight: 2,
-      fillColor: '#1e40af',
-      fillOpacity: 0.8,
-    }).addTo(mapRef.current);
+    // Only show a dark blue circle at user's location if user location has loaded
+    if (showUserMarker) {
+      centerMarkerRef.current = L.circleMarker([center.lat, center.lon], {
+        radius: 8,
+        color: '#1e40af',
+        weight: 2,
+        fillColor: '#1e40af',
+        fillOpacity: 0.8,
+      }).addTo(mapRef.current);
+    }
     
     // Show red circle at first provider's location
     if (markers.length > 0) {
@@ -138,7 +141,7 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm }: 
         fillOpacity: 0.12,
       }).addTo(mapRef.current);
     }
-  }, [center.lat, center.lon, radiusKm ?? 0, markers]);
+  }, [center.lat, center.lon, radiusKm ?? 0, markers, showUserMarker]);
 
   useEffect(() => {
     return () => {

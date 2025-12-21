@@ -66,6 +66,7 @@ export default function BrowsePage() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userLocationLoaded, setUserLocationLoaded] = useState(false);
   const [endForm, setEndForm] = useState<{ jobId: string; reason: string; comment: string; rating: string }>({
     jobId: '',
     reason: 'completed',
@@ -127,6 +128,8 @@ export default function BrowsePage() {
         }
       } catch {
         // ignore
+      } finally {
+        setUserLocationLoaded(true);
       }
     };
     fetchUserLocation();
@@ -311,6 +314,7 @@ export default function BrowsePage() {
             center={center}
             radiusKm={distanceKm || undefined}
             markers={markerData}
+            showUserMarker={userLocationLoaded}
             onMarkerClick={(m) => {
               const found = filteredProviders.find((p) => p.id === m.id) || null;
               setSelectedProvider(found);
