@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { SkeletonCircle } from './skeleton';
 
 type Props = {
   prefilledName?: string;
@@ -17,10 +18,12 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
   const [profileName, setProfileName] = useState(prefilledName || 'Guest');
   const [profilePic, setProfilePic] = useState(prefilledPhoto || PLACEHOLDER);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (prefilledName) setProfileName(prefilledName);
     if (prefilledPhoto) setProfilePic(prefilledPhoto);
+    if (prefilledName || prefilledPhoto) setLoading(false);
   }, [prefilledName, prefilledPhoto]);
 
   useEffect(() => {
@@ -29,6 +32,7 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
     if (!token) {
       setIsLoggedIn(false);
       setMenuOpen(false);
+      setLoading(false);
       return;
     }
     setIsLoggedIn(true);
@@ -47,6 +51,8 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
         }
       } catch {
         // ignore and keep defaults
+      } finally {
+        setLoading(false);
       }
     };
     loadProfile();
@@ -77,7 +83,12 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
           <Link href="/contact" style={{ color: 'var(--text-secondary)', transition: 'color 0.2s', opacity: 0.8 }} onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')} onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.8')}>
             Contact
           </Link>
-          {!isLoggedIn && (
+          {loading ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ width: 100, height: '1.5rem', background: 'linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 2s infinite', borderRadius: '0.375rem' }} />
+              <SkeletonCircle size="32px" />
+            </div>
+          ) : !isLoggedIn ? (
             <Link
               href="/login"
               style={{
@@ -99,8 +110,7 @@ export default function SiteHeader({ prefilledName, prefilledPhoto }: Props) {
             >
               Log in
             </Link>
-          )}
-          {isLoggedIn && (
+          ) : (
             <div style={{ position: 'relative' }}>
               <button
                 type="button"

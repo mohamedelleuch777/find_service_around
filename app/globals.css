@@ -184,3 +184,13 @@ input:focus, textarea:focus, select:focus {
 .bg-gradient-4 {
   background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 }
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

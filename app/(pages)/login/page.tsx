@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { FormFieldSkeleton } from '../../components/skeleton';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -93,46 +94,56 @@ export default function LoginPage() {
         </p>
 
         <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Email address</span>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{ padding: '0.85rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border)', fontFamily: 'inherit' }}
-            />
-          </label>
+          {checking || loading ? (
+            <>
+              <FormFieldSkeleton />
+              <FormFieldSkeleton />
+              <div style={{ height: '2.85rem', background: 'linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 2s infinite', borderRadius: '0.75rem' }} />
+            </>
+          ) : (
+            <>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Email address</span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  style={{ padding: '0.85rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border)', fontFamily: 'inherit' }}
+                />
+              </label>
 
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Password</span>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{ padding: '0.85rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border)', fontFamily: 'inherit' }}
-            />
-          </label>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Password</span>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  style={{ padding: '0.85rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border)', fontFamily: 'inherit' }}
+                />
+              </label>
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              padding: '1rem',
-              borderRadius: '0.75rem',
-              border: 'none',
-              background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
-              color: 'white',
-              fontWeight: 700,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: 'var(--shadow-md)',
-              opacity: loading ? 0.7 : 1,
-              transition: 'all 0.2s',
-            }}
-          >
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  padding: '1rem',
+                  borderRadius: '0.75rem',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                  color: 'white',
+                  fontWeight: 700,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  boxShadow: 'var(--shadow-md)',
+                  opacity: loading ? 0.7 : 1,
+                  transition: 'all 0.2s',
+                }}
+              >
+                {loading ? 'Signing in...' : 'Sign in'}
+              </button>
+            </>
+          )}
         </form>
 
         {status && (

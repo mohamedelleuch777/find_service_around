@@ -2,10 +2,12 @@
 
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import SiteHeader from '../../components/site-header';
+import { JobCardSkeleton } from '../../components/skeleton';
 
 type Job = {
   id: string;
   title?: string;
+  jobId?: string;
   clientId: string;
   providerId: string;
   status: string;
@@ -514,7 +516,15 @@ export default function JobsPage() {
       <SiteHeader />
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1.5rem 3rem', display: 'grid', gap: '1.2rem' }}>
         <h1 style={{ margin: 0 }}>My jobs</h1>
-        {loading ? <div>Loading...</div> : renderTable('All jobs', allJobs)}
+        {loading ? (
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <JobCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : (
+          renderTable('All jobs', allJobs)
+        )}
       </main>
     </div>
   );

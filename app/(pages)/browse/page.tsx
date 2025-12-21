@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import SiteHeader from '../../components/site-header';
+import { SkeletonLine, SkeletonBox } from '../../components/skeleton';
 
 const BrowseMap = dynamic(() => import('./browse-map'), { ssr: false });
 
@@ -25,6 +26,9 @@ type Provider = {
   postalCode: string;
   photoDataUrl?: string;
   providerWorkStatus?: string;
+  ratingAvg?: number;
+  ratingCount?: number;
+  phone?: string;
 };
 
 type Option = { id: string; name: string; categoryId?: string };
@@ -61,6 +65,7 @@ export default function BrowsePage() {
   const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [endForm, setEndForm] = useState<{ jobId: string; reason: string; comment: string; rating: string }>({
     jobId: '',
     reason: 'completed',
@@ -70,6 +75,7 @@ export default function BrowsePage() {
 
   useEffect(() => {
     const load = async () => {
+      setLoading(true);
       try {
         const res = await fetch('/api/providers');
         const data = await res.json();
@@ -84,6 +90,8 @@ export default function BrowsePage() {
         setProviders(data.providers || []);
       } catch {
         // ignore
+      } finally {
+        setLoading(false);
       }
     };
     load();
@@ -171,49 +179,57 @@ export default function BrowsePage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <span style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '0.95rem' }}>🔍 Categories & Jobs</span>
             <div style={{ display: 'grid', gap: '0.75rem' }}>
-              {categories.map((c) => {
-                const enabled = selectedCategories.includes(c.id);
-                const categoryJobs = jobOptions.filter((j) => j.categoryId === c.id);
-                return (
-                  <div key={c.id} style={{ border: '1px solid var(--border)', borderRadius: '0.5rem', padding: '0.65rem 0.75rem', background: 'var(--bg-light)' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, cursor: 'pointer', color: 'var(--text-primary)' }}>
-                      <input
-                        type="checkbox"
-                        checked={enabled}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedCategories([...selectedCategories, c.id]);
-                          } else {
-                            setSelectedCategories(selectedCategories.filter((id) => id !== c.id));
-                            setSelectedJobs(selectedJobs.filter((jid) => !categoryJobs.some((j) => j.id === jid)));
-                          }
-                        }}
-                      />
-                      {c.name}
-                    </label>
-                    {enabled && categoryJobs.length > 0 && (
-                      <div style={{ marginTop: '0.4rem', paddingLeft: '1.6rem', display: 'grid', gap: '0.3rem' }}>
-                        {categoryJobs.map((j) => {
-                          const jobEnabled = selectedJobs.includes(j.id);
-                          return (
-                            <label key={j.id} style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', cursor: 'pointer' }}>
-                              <input
-                                type="checkbox"
-                                checked={jobEnabled}
-                                onChange={(e) => {
-                                  if (e.target.checked) setSelectedJobs([...selectedJobs, j.id]);
-                                  else setSelectedJobs(selectedJobs.filter((id) => id !== j.id));
-                                }}
-                              />
-                              {j.name}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              {loading ? (
+                <>
+                  {[1, 2, 3].map((i) => (
+                    <SkeletonBox key={i} width="100%" height="80px" borderRadius="0.5rem" />
+                  ))}
+                </>
+              ) : (
+                categories.map((c) => {
+                  const enabled = selectedCategories.includes(c.id);
+                  const categoryJobs = jobOptions.filter((j) => j.categoryId === c.id);
+                  return (
+                    <div key={c.id} style={{ border: '1px solid var(--border)', borderRadius: '0.5rem', padding: '0.65rem 0.75rem', background: 'var(--bg-light)' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, cursor: 'pointer', color: 'var(--text-primary)' }}>
+                        <input
+                          type="checkbox"
+                          checked={enabled}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedCategories([...selectedCategories, c.id]);
+                            } else {
+                              setSelectedCategories(selectedCategories.filter((id) => id !== c.id));
+                              setSelectedJobs(selectedJobs.filter((jid) => !categoryJobs.some((j) => j.id === jid)));
+                            }
+                          }}
+                        />
+                        {c.name}
+                      </label>
+                      {enabled && categoryJobs.length > 0 && (
+                        <div style={{ marginTop: '0.4rem', paddingLeft: '1.6rem', display: 'grid', gap: '0.3rem' }}>
+                          {categoryJobs.map((j) => {
+                            const jobEnabled = selectedJobs.includes(j.id);
+                            return (
+                              <label key={j.id} style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', cursor: 'pointer' }}>
+                                <input
+                                  type="checkbox"
+                                  checked={jobEnabled}
+                                  onChange={(e) => {
+                                    if (e.target.checked) setSelectedJobs([...selectedJobs, j.id]);
+                                    else setSelectedJobs(selectedJobs.filter((id) => id !== j.id));
+                                  }}
+                                />
+                                {j.name}
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
 
@@ -227,7 +243,8 @@ export default function BrowsePage() {
                 step={10}
                 value={distanceKm}
                 onChange={(e) => setDistanceKm(Number(e.target.value))}
-                style={{ flex: 1 }}
+                style={{ flex: 1, opacity: loading ? 0.5 : 1 }}
+                disabled={loading}
               />
               <span style={{ width: 52, textAlign: 'right', fontWeight: 700, color: 'var(--primary)' }}>{distanceKm === 0 ? 'Any' : distanceKm}</span>
             </div>
@@ -239,9 +256,10 @@ export default function BrowsePage() {
               <button
                 type="button"
                 onClick={() => setCenter(DEFAULT_CENTER)}
-                style={{ padding: '0.65rem 0.9rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: 'white', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-primary)', transition: 'all 0.2s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-light)')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
+                disabled={loading}
+                style={{ padding: '0.65rem 0.9rem', borderRadius: '0.5rem', border: '1px solid var(--border)', background: 'white', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-primary)', transition: 'all 0.2s', opacity: loading ? 0.5 : 1 }}
+                onMouseEnter={(e) => !loading && (e.currentTarget.style.background = 'var(--bg-light)')}
+                onMouseLeave={(e) => !loading && (e.currentTarget.style.background = 'white')}
               >
                 Reset
               </button>
@@ -267,14 +285,19 @@ export default function BrowsePage() {
                     }
                   }
                 }}
-                style={{ padding: '0.65rem 0.9rem', borderRadius: '0.5rem', border: '1px solid var(--primary)', background: 'var(--primary)', color: 'white', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.2s' }}
+                disabled={loading}
+                style={{ padding: '0.65rem 0.9rem', borderRadius: '0.5rem', border: '1px solid var(--primary)', background: 'var(--primary)', color: 'white', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.2s', opacity: loading ? 0.5 : 1 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'var(--primary-dark)';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  if (!loading) {
+                    e.currentTarget.style.background = 'var(--primary-dark)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'var(--primary)';
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  if (!loading) {
+                    e.currentTarget.style.background = 'var(--primary)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }
                 }}
               >
                 My location
