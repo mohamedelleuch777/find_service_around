@@ -26,6 +26,7 @@ const DEFAULT_ZOOM = 8;
 let leafletSingleton: any = null;
 let markerIconSingleton: any = null;
 let userHomeIconSingleton: any = null;
+let jobIconSingleton: any = null;
 
 function getLeaflet() {
   if (leafletSingleton) return leafletSingleton;
@@ -37,10 +38,17 @@ function getLeaflet() {
     iconAnchor: [11, 11],
   });
   userHomeIconSingleton = L.divIcon({
-    html: `<i class="fas fa-home" style="color: white; font-size: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); display: block; width: 30px; height: 30px; line-height: 30px; text-align: center;"></i>`,
+    html: `<i class="fas fa-home" style="color: #1e40af; font-size: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); display: block; width: 30px; height: 30px; line-height: 30px; text-align: center;"></i>`,
     iconSize: [30, 30],
     iconAnchor: [15, 15],
     popupAnchor: [0, -15],
+    className: '',
+  });
+  jobIconSingleton = L.divIcon({
+    html: `<i class="fas fa-briefcase" style="color: #dc2626; font-size: 24px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); display: block; width: 24px; height: 24px; line-height: 24px; text-align: center;"></i>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12],
     className: '',
   });
   leafletSingleton = L;
@@ -122,16 +130,12 @@ export default function BrowseMap({ center, markers, onMarkerClick, radiusKm, sh
       }).addTo(mapRef.current);
     }
     
-    // Show red circle for each provider's location
+    // Show job icon for each provider's location
     markers.forEach((marker) => {
-      const circle = L.circleMarker([marker.lat, marker.lon], {
-        radius: 8,
-        color: '#dc2626',
-        weight: 2,
-        fillColor: '#dc2626',
-        fillOpacity: 0.8,
+      const jobMarker = L.marker([marker.lat, marker.lon], { 
+        icon: jobIconSingleton 
       }).addTo(mapRef.current);
-      providerCirclesRef.current.push(circle);
+      providerCirclesRef.current.push(jobMarker);
     });
     
     // Show radius circle if distance filter is active
