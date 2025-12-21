@@ -41,6 +41,7 @@ export async function POST(request: Request) {
     categoryId: body.categoryId ?? '',
     jobId: body.jobId ?? '',
     keywords: Array.isArray(body.keywords) ? body.keywords : [],
+    score: body.score === undefined || body.score === '' ? null : Number(body.score),
     updatedAt: Date.now(),
   };
 

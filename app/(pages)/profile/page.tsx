@@ -66,6 +66,7 @@ function ProfilePageInner() {
   const [ratingAvg, setRatingAvg] = useState<number | null>(null);
   const [ratingCount, setRatingCount] = useState<number>(0);
   const [reviewCount, setReviewCount] = useState<number>(0);
+  const [score, setScore] = useState<number | null>(null);
   const [providerWorkStatus, setProviderWorkStatus] = useState('available');
   const [activeTab, setActiveTab] = useState<'basic' | 'location' | 'provider' | 'gallery'>('basic');
   const targetUserId = searchParams?.get('userId') || resolvedUserId;
@@ -215,6 +216,7 @@ function ProfilePageInner() {
           setRatingAvg(typeof data.profile.ratingAvg === 'number' ? data.profile.ratingAvg : null);
           setRatingCount(data.profile.ratingCount ?? 0);
           setReviewCount(data.profile.reviewCount ?? 0);
+          setScore(typeof data.profile.score === 'number' ? data.profile.score : null);
 
           const fullName = `${data.profile.firstName ?? ''} ${data.profile.lastName ?? ''}`.trim() || 'User';
           setProfileName(fullName);
@@ -322,6 +324,7 @@ function ProfilePageInner() {
           keywords,
           folders,
           photoDataUrl,
+          score,
         }),
       });
       const data = await res.json();
@@ -378,6 +381,14 @@ function ProfilePageInner() {
             </div>
             <div style={{ color: '#475569', marginTop: '0.25rem' }}>
               {initializing ? <SkeletonLine width="150px" height="1rem" /> : (`${ratingCount} rating${ratingCount === 1 ? '' : 's'} • ${reviewCount} review${reviewCount === 1 ? '' : 's'}`)}
+            </div>
+          </div>
+          <div style={{ padding: '0.65rem 0.9rem', border: '1px solid #e2e8f0', borderRadius: 12, background: '#fff', boxShadow: '0 10px 30px rgba(15,23,42,0.08)' }}>
+            <div style={{ fontWeight: 700, color: '#0f172a' }}>
+              {initializing ? <SkeletonLine width="80px" height="1.5rem" /> : (score !== null ? `${score}% Confidence` : 'No score')}
+            </div>
+            <div style={{ color: '#475569', marginTop: '0.25rem', fontSize: '0.9rem' }}>
+              System reliability score
             </div>
           </div>
         </div>
@@ -532,6 +543,19 @@ function ProfilePageInner() {
                 min={0}
                 value={age}
                 onChange={(e) => setAge(e.target.value === '' ? '' : Number(e.target.value))}
+                style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
+              />
+            )}
+          </label>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            <span>Confidence Score (0-100) <span style={{ color: '#64748b', fontSize: '0.9rem' }}>System reliability</span></span>
+            {initializing ? <FormFieldSkeleton /> : (
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={score === null ? '' : score}
+                onChange={(e) => setScore(e.target.value === '' ? null : Number(e.target.value))}
                 style={{ padding: '0.85rem', borderRadius: 10, border: '1px solid #cbd5e1' }}
               />
             )}
